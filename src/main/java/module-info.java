@@ -3,6 +3,7 @@ module com.example.projectedp {
     requires javafx.fxml;
 
     requires org.kordamp.bootstrapfx.core;
+    requires java.sql;
 
     opens com.example.projectedp to javafx.fxml;
     opens com.example.projectedp.controller to javafx.fxml;

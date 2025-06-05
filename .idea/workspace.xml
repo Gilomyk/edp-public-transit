@@ -4,22 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="05207925-d6ff-4957-9132-83f8a7c51e3b" name="Changes" comment="Rebuild project, added event and handler mockups">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/NotificationRequestedHandler.java" afterDir="false" />
+    <list default="true" id="05207925-d6ff-4957-9132-83f8a7c51e3b" name="Changes" comment="Added more events and stop search implementation">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/StopRemovedFromFavoritesEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopRemovedFromFavoritesHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/model/RecentSearch.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/service/DatabaseService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/MainApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/MainApp.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/controller/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/controller/MainController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/FavoriteSavedEvent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/NotificationRequestedEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/NotificationRequestedEvent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/StopAddedToFavoritesEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/StopAddedToFavoritesEvent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/StopSearchRequestedEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/StopSearchRequestedEvent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/ApiErrorHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/ApiErrorHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/DeparturesLoadedHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/DeparturesLoadedHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/FavoriteSavedHandler.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopAddedToFavoritesHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopAddedToFavoritesHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopSearchRequestedHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopSearchRequestedHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopSelectedHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopSelectedHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/projectedp/view/main.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/projectedp/view/main.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,27 +67,30 @@
   &quot;associatedIndex&quot;: 8
 }</component>
   <component name="ProjectId" id="2y5CWhEXjNRebGAM8AIKhOmkyL9" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.MainApp.executor": "Coverage",
-    "Gradle.Build edp-public-transit.executor": "Run",
-    "Gradle.edp-public-transit [:MainApp.main()].executor": "Run",
-    "Gradle.edp-public-transit.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/User/IdeaProjects/edp-public-transit/src/main/java/com/example/projectedp",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.MainApp.executor&quot;: &quot;Coverage&quot;,
+    &quot;Gradle.Build edp-public-transit.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.edp-public-transit [:MainApp.main()].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.edp-public-transit.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/IdeaProjects/edp-public-transit/src/main/java/com/example/projectedp&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;promo.database&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\User\IdeaProjects\edp-public-transit\src\main\java\com\example\projectedp" />
@@ -157,12 +157,32 @@
       <option name="project" value="LOCAL" />
       <updated>1749120124727</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Added more events and stop search implementation">
+      <option name="closed" value="true" />
+      <created>1749126001767</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1749126001767</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Rebuild project, added event and handler mockups" />
-    <option name="LAST_COMMIT_MESSAGE" value="Rebuild project, added event and handler mockups" />
+    <MESSAGE value="Added more events and stop search implementation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added more events and stop search implementation" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/projectEDP$MainApp.ic" NAME="MainApp Coverage Results" MODIFIED="1749122295961" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
