@@ -10,4 +10,5 @@ module com.example.projectedp {
     exports com.example.projectedp;
     exports com.example.projectedp.controller;
     exports com.example.projectedp.event;
+    exports com.example.projectedp.model;
 }

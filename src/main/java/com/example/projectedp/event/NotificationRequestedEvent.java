@@ -1,13 +1,13 @@
 package com.example.projectedp.event;
 
-public class NotificationRequestedEvent {
-    private final String departureId;
+public class NotificationRequestedEvent{
+    private final String message;
 
-    public NotificationRequestedEvent(String departureId) {
-        this.departureId = departureId;
+    public NotificationRequestedEvent(String message) {
+        this.message = message;
     }
 
-    public String getDepartureId() {
-        return departureId;
+    public String getMessage() {
+        return message;
     }
 }

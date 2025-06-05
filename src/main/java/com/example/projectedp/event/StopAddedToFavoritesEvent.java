@@ -1,13 +1,15 @@
 package com.example.projectedp.event;
 
-public class StopAddedToFavoritesEvent {
-    private final String stopName;
+import com.example.projectedp.model.Stop;
 
-    public StopAddedToFavoritesEvent(String stopName) {
-        this.stopName = stopName;
+public class StopAddedToFavoritesEvent {
+    private final Stop stop;
+
+    public StopAddedToFavoritesEvent(Stop stop) {
+        this.stop = stop;
     }
 
-    public String getStopName() {
-        return stopName;
+    public Stop getStop() {
+        return stop;
     }
 }

@@ -1,13 +1,13 @@
 package com.example.projectedp.event;
 
 public class StopSearchRequestedEvent {
-    private final String stopName;
+    private final String query;
 
-    public StopSearchRequestedEvent(String stopName) {
-        this.stopName = stopName;
+    public StopSearchRequestedEvent(String query) {
+        this.query = query;
     }
 
-    public String getStopName() {
-        return stopName;
+    public String getQuery() {
+        return query;
     }
 }
