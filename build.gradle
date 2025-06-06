@@ -38,6 +38,11 @@ javafx {
 dependencies {
     implementation('org.kordamp.bootstrapfx:bootstrapfx-core:0.4.0')
     implementation("org.xerial:sqlite-jdbc:3.40.0.0")
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation "org.openjfx:javafx-controls:19.0.2:win"
+    implementation "org.openjfx:javafx-fxml:19.0.2:win"
+    implementation "org.openjfx:javafx-web:19.0.2:win"
+    implementation "org.openjfx:javafx-media:19.0.2:win"
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")

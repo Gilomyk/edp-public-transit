@@ -1,82 +1,106 @@
 package com.example.projectedp.controller;
 
+import com.example.projectedp.MainApp;
 import com.example.projectedp.event.*;
 import com.example.projectedp.model.*;
+import com.example.projectedp.service.*;
+
 import javafx.application.Platform;
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import netscape.javascript.JSObject;
+
+import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 public class MainController {
 
-    @FXML
-    private TextField searchField;
+    @FXML private TextField searchField;
+    @FXML private Button searchButton;
+    @FXML private ListView<Stop> stopList;
+    @FXML private ListView<Departure> departureList;
+    @FXML private ListView<Line> lineList;
+    @FXML private Button addToFavoritesButton;
+    @FXML private Button removeFromFavoritesButton;
+    @FXML private Button notifyButton;
+    @FXML private ListView<Stop> favoritesList;
+    @FXML private ListView<RecentSearch> recentSearchesList;
+    @FXML private WebView mapView;
 
-    @FXML
-    private Button searchButton;
-
-    @FXML
-    private ListView<Stop> stopList;
-
-    @FXML
-    private ListView<Departure> departureList;
-
-    @FXML
-    private Button addToFavoritesButton;
-
-    @FXML
-    private Button removeFromFavoritesButton;
-
-    @FXML
-    private Button notifyButton;
-
-    @FXML
-    private ListView<Stop> favoritesList;
-
-    @FXML
-    public void handleShowAllStops() {
+    @FXML public void handleShowAllStops() {
         stopList.getItems().setAll(allStops);
     }
 
+    private List<Stop> allStops;
     private final LinkedList<RecentSearch> recentSearches = new LinkedList<>();
-
-    @FXML
-    private ListView<RecentSearch> recentSearchesList;
-
+    private JSObject jsBridge;
     private EventBus eventBus;
-
-    private final List<Stop> allStops = new ArrayList<>();
+    private DatabaseService databaseService;
+    private ApiService apiService;
 
     public void setEventBus(EventBus eventBus) {
         this.eventBus = eventBus;
     }
+    public void setDatabaseService(DatabaseService databaseService) { this.databaseService = databaseService; }
+    public void setApiService(ApiService apiService) { this.apiService = apiService; }
+
 
     @FXML
     public void initialize() {
-        // Przykładowe przystanki
-        allStops.add(new Stop("1", "Rondo Solidarności", 50.0, 20.0));
-        allStops.add(new Stop("2", "Dworzec", 50.1, 20.1));
-        allStops.add(new Stop("3", "Piłsudskiego", 50.2, 20.2));
 
-        // Inicjalizacja listy
-        stopList.getItems().addAll(allStops);
+        // Inicjalizacja WebView
+        WebEngine webEngine = mapView.getEngine();
+        webEngine.load(MainApp.class.getResource("view/map.html").toExternalForm());
 
-        departureList.getItems().addAll(
-                new Departure("d001", "Linia 5", "Centrum", LocalDateTime.of(2025, 6, 5, 14, 30)),
-                new Departure("d002", "Linia 8", "Dworzec", LocalDateTime.of(2025, 6, 5, 14, 45))
-        );
+        // Ustawianie jsBridge
+        webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                jsBridge = (JSObject) webEngine.executeScript("window");
+                jsBridge.setMember("app", this);
+            }
+        });
+
+        webEngine.setOnError(event -> {
+            System.out.println("JS Error: " + event.getMessage());
+        });
+        webEngine.setOnAlert(event -> {
+            System.out.println("JS Alert: " + event.getData());
+        });
+        webEngine.setOnStatusChanged(event -> {
+            System.out.println("JS Status: " + event.getData());
+        });
 
         // Dodanie do ulubionych
         addToFavoritesButton.setOnAction(event -> {
             Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
             if (selectedStop != null) {
-                eventBus.post(new StopAddedToFavoritesEvent(selectedStop));
+                try {
+                    databaseService.addFavorite(selectedStop);
+                    this.updateFavoritesList(databaseService.getAllFavorites());
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    // Możesz wysłać ApiErrorEvent albo pokazać komunikat w UI
+                }
+            }
+        });
+
+        // Usuwanie z polubionych
+        removeFromFavoritesButton.setOnAction(event -> {
+            Stop selectedStop = favoritesList.getSelectionModel().getSelectedItem();
+            if (selectedStop != null) {
+                try {
+                    databaseService.removeFavorite(selectedStop);
+                    List<Stop> updated = databaseService.getAllFavorites();
+                    this.updateFavoritesList(updated);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -95,20 +119,22 @@ public class MainController {
             }
         });
 
-        // Obsługa kliknięcia "Powiadom o kursie" – opcjonalnie
-        notifyButton.setOnAction(event -> eventBus.post(new NotificationRequestedEvent("Kurs się zbliża!")));
-
+        // Przypadek dla polubionych
         favoritesList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 eventBus.post(new StopSelectedEvent(newVal));
             }
         });
 
-        // Usuwanie z polubionych
-        removeFromFavoritesButton.setOnAction(event -> {
-            Stop selectedStop = favoritesList.getSelectionModel().getSelectedItem();
+        // Obsługa kliknięcia "Powiadom o kursie" – opcjonalnie
+        notifyButton.setOnAction(event -> {
+            Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
             if (selectedStop != null) {
-                eventBus.post(new StopRemovedFromFavoritesEvent(selectedStop));
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Powiadomienie");
+                alert.setHeaderText(null);
+                alert.setContentText("Powiadomienie o przystanku: " + selectedStop.getName());
+                alert.showAndWait();
             }
         });
 
@@ -130,17 +156,32 @@ public class MainController {
             }
         });
 
+        Platform.runLater(() -> {
+            eventBus.post(new AppInitializedEvent());
+        });
+
     }
+
+    private void showError(String message) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Błąd");
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
+    }
+
 
     public List<Stop> getAllStops() {
         return allStops;
     }
 
     // Aktualizacja widoku przystanków
-    public void updateStopList(List<Stop> filteredStops) {
-        stopList.getItems().setAll(filteredStops);
+    public void updateStopList(List<Stop> stops) {
+        this.allStops = stops;
+        stopList.getItems().setAll(stops);
     }
-
 
     // Aktaulizacja widoku polubionych przystanków
     public void updateFavoritesList(List<Stop> favorites) {
@@ -148,6 +189,30 @@ public class MainController {
         Platform.runLater(() -> {
             favoritesList.getItems().setAll(favorites);
         });
+    }
+
+    public void updateDepartureList(List<Departure> departures) {
+        departureList.getItems().setAll(departures);
+    }
+
+    public void updateLineList(List<Line> lines) {
+        lineList.getItems().setAll(lines);
+    }
+
+
+
+    /** Rysuje markery dla listy przystanków na mapie */
+    public void plotStopsOnMap(List<Stop> stops) {
+        // 1. Najpierw usuń istniejące markery
+        jsBridge.call("clearMarkers");
+        // 2. Dodaj nowe markery
+        for (Stop s : stops) {
+            String jsCode = String.format(
+                    "addMarker(%f, %f, '%s', '%s')",
+                    s.getLatitude(), s.getLongitude(), s.getId(), s.getName().replace("'", "\\'")
+            );
+            jsBridge.call("eval", jsCode);
+        }
     }
 
     private void showRecentSearches() {
@@ -181,6 +246,5 @@ public class MainController {
             }
         });
     }
-
 
 }

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ✨ Import Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"
+          integrity="sha512‐xwE/NgDkaB1v/B1Wf58T22LPMc+TsVGbWF5SDrM7JoMmEldQysUKyaek7Skw0pP4h++vCZW3BrN9QY4uS+YQmA=="
+          crossorigin=""/>
+
+    <style>
+        /* Map container musi mieć wysokość */
+        #map { height: 100vh; margin: 0; padding: 0; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <!-- ✨ Import Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"
+            integrity="sha512‐gZwIG9x3wUXgL4WVjZXjKC6BwX+c+hOLOWjix8ZDebIG6nSY1hYC5VxZpjM6dMUpRoIGVGIGFXz4ZMZq2mMlQw=="
+            crossorigin=""></script>
+
+    <script>
+        // 1. Inicjalizacja mapy: współrzędne centrum Warszawy, zoom 13
+        var map = L.map('map').setView([52.2297, 21.0122], 13);
+
+        // 2. Dodanie kafelków OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Tablica przechowująca markery, by można było nimi zarządzać
+        var markers = {};
+
+        // 3. Funkcja dodająca marker na mapie (wywoływana z Java)
+        function addMarker(lat, lon, stopId, stopName) {
+            // Jeśli marker o tym ID już jest, nie dodawaj ponownie
+            if (markers[stopId]) return;
+
+            var marker = L.marker([lat, lon]).addTo(map)
+                .bindPopup(stopName);
+            marker.stopId = stopId;  // zapamiętujemy w obiekcie marker ID
+
+            // Kliknięcie w marker → wywołanie metody Java: onMarkerClicked(stopId)
+            marker.on('click', function() {
+                // Użycie obiektu 'app' zdefiniowanego w JavaFX (czeka na inicjalizację)
+                app.onMarkerClicked(marker.stopId);
+            });
+
+            markers[stopId] = marker;
+        }
+
+        // 4. Funkcja usuwająca wszystkie markery (wywoływana z Java)
+        function clearMarkers() {
+            for (var id in markers) {
+                map.removeLayer(markers[id]);
+            }
+            markers = {};
+        }
+
+        // 5. Powiadomienie dla Javy, że mapa się załadowała
+        function mapLoaded() {
+            app.onMapInitialized();
+        }
+
+        // Po pełnym załadowaniu, informujemy Javę
+        document.addEventListener('DOMContentLoaded', function() {
+            mapLoaded();
+        });
+    </script>
+
+</body>
+</html>

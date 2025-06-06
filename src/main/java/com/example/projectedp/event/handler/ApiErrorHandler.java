@@ -1,11 +1,22 @@
 package com.example.projectedp.event.handler;
 
-import com.example.projectedp.event.EventHandler;
 import com.example.projectedp.event.ApiErrorEvent;
+import com.example.projectedp.event.EventHandler;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 
-public class ApiErrorHandler implements EventHandler<ApiErrorEvent>{
+public class ApiErrorHandler implements EventHandler<ApiErrorEvent> {
+
+    @Override
     public void handle(ApiErrorEvent event) {
-        System.err.println("❌ Błąd API: " + event.getMessage());
-        // Wyświetl komunikat użytkownikowi
+        String msg = event.getMessage();
+
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Błąd API");
+            alert.setHeaderText("Wystąpił błąd przy pobieraniu danych");
+            alert.setContentText(msg);
+            alert.showAndWait();
+        });
     }
 }

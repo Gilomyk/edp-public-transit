@@ -4,6 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 
+<?import javafx.scene.web.WebView?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.projectedp.controller.MainController">
 
     <top>
@@ -55,4 +56,15 @@
             </VBox>
         </SplitPane>
     </center>
+
+    <right>
+        <SplitPane>
+            <!-- LEWA POŁOWA: Twoje ListView i przyciski -->
+            <VBox spacing="5">
+                <!-- pola: searchField, stopList, favoritesList, itd. -->
+            </VBox>
+            <!-- PRAWA POŁOWA: WebView z mapą -->
+            <WebView fx:id="mapView" prefWidth="500" prefHeight="600"/>
+        </SplitPane>
+    </right>
 </BorderPane>

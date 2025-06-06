@@ -24,22 +24,42 @@ public class MainApp extends Application {
         DatabaseService db = new DatabaseService();
         db.init();
 
+        EventBus eventBus = new EventBus();
+
+        ApiService apiService = new ApiService(eventBus);
+
         // Przekazanie EventBus do kontrolera
         MainController controller = loader.getController();
-        EventBus eventBus = new EventBus();
         controller.setEventBus(eventBus);
+        controller.setDatabaseService(db);
+        controller.setApiService(apiService);
 
         List<Stop> favs = db.getAllFavorites();
         controller.updateFavoritesList(favs);
 
         // Rejestracja handlerów
-        eventBus.register(DeparturesLoadedEvent.class, new DeparturesLoadedHandler());
-        eventBus.register(NotificationRequestedEvent.class, new NotificationRequestedHandler());
-        eventBus.register(StopSelectedEvent.class, new StopSelectedHandler());
-        eventBus.register(ApiErrorEvent.class, new ApiErrorHandler());
-        eventBus.register(StopSearchRequestedEvent.class, new StopSearchRequestedHandler(db, controller));
-        eventBus.register(StopAddedToFavoritesEvent.class, new StopAddedToFavoritesHandler(db, controller));
-        eventBus.register(StopRemovedFromFavoritesEvent.class, new StopRemovedFromFavoritesHandler(db, controller));
+        // 1) StopSearchRequestedEvent → StopSearchRequestedHandler (filtracja + zapis w bazie + cache)
+        eventBus.register(StopSearchRequestedEvent.class,
+                new StopSearchRequestedHandler(db, controller, apiService));
+
+        // 2) StopSelectedEvent → StopSelectedHandler (wywołuje pobranie odjazdów)
+                eventBus.register(StopSelectedEvent.class,
+                        new StopSelectedHandler(apiService, controller));
+
+        // 3) StopsLoadedEvent → StopsLoadedHandler (aktualizacja listy i mapy przystanków)
+                eventBus.register(StopsLoadedEvent.class,
+                        new StopsLoadedHandler(controller));
+
+        // 4) DeparturesLoadedEvent → DeparturesLoadedHandler (aktualizacja listy odjazdów)
+                eventBus.register(DeparturesLoadedEvent.class,
+                        new DeparturesLoadedHandler(controller));
+
+        // 5) ApiErrorEvent → ApiErrorHandler (pokazywanie alertów)
+                eventBus.register(ApiErrorEvent.class,
+                        new ApiErrorHandler());
+
+        // 6) Inicjalizacja danych
+                eventBus.register(AppInitializedEvent.class, new AppInitializedHandler(controller, apiService, db));
 
         stage.setTitle("Rozkład jazdy 3000");
         stage.setScene(new Scene(root, 1000, 600));
