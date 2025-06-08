@@ -6,6 +6,7 @@ import com.example.projectedp.model.Departure;
 import com.example.projectedp.controller.MainController;
 import javafx.application.Platform;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -23,6 +24,8 @@ public class DeparturesLoadedHandler implements EventHandler<DeparturesLoadedEve
     @Override
     public void handle(DeparturesLoadedEvent event) {
         List<Departure> departures = event.getDepartures();
+
+        departures.sort(Comparator.comparing(Departure::getTime));
 
         // GUI musi być zaktualizowane na wątku JavaFX
         Platform.runLater(() -> {

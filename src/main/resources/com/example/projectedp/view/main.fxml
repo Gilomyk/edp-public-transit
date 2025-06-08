@@ -44,6 +44,16 @@
                 <Label text="Przystanki"/>
                 <ListView fx:id="stopList"/>
                 <Button fx:id="addToFavoritesButton" text="❤️ Dodaj do ulubionych"/>
+                <Button fx:id="getLinesButton" text="Pobierz Linie"/>
+            </VBox>
+
+            <VBox spacing="5">
+                <padding>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+                </padding>
+                <Label text="Linie"/>
+                <ListView fx:id="lineList"/>
+                <Button fx:id="getDeparturesButton" text="Pobierz odjazdy"/>
             </VBox>
 
             <VBox spacing="5">

@@ -61,6 +61,9 @@ public class MainApp extends Application {
         // 6) Inicjalizacja danych
                 eventBus.register(AppInitializedEvent.class, new AppInitializedHandler(controller, apiService, db));
 
+        eventBus.register(LinesLoadedEvent.class,
+                new LinesLoadedHandler(apiService, controller));
+
         stage.setTitle("Rozkład jazdy 3000");
         stage.setScene(new Scene(root, 1000, 600));
         stage.show();

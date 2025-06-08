@@ -15,12 +15,11 @@ import netscape.javascript.JSObject;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class MainController {
 
+    // --- UI komponenty ---
     @FXML private TextField searchField;
     @FXML private Button searchButton;
     @FXML private ListView<Stop> stopList;
@@ -28,37 +27,50 @@ public class MainController {
     @FXML private ListView<Line> lineList;
     @FXML private Button addToFavoritesButton;
     @FXML private Button removeFromFavoritesButton;
+    @FXML private Button getLinesButton;
+    @FXML private Button getDeparturesButton;
     @FXML private Button notifyButton;
     @FXML private ListView<Stop> favoritesList;
     @FXML private ListView<RecentSearch> recentSearchesList;
     @FXML private WebView mapView;
 
-    @FXML public void handleShowAllStops() {
-        stopList.getItems().setAll(allStops);
-    }
-
-    private List<Stop> allStops;
+    // --- Pola pomocnicze ---
+    private final List<Stop> allStops = new ArrayList<>();
     private final LinkedList<RecentSearch> recentSearches = new LinkedList<>();
     private JSObject jsBridge;
+    private boolean mapInitialized = false;
     private EventBus eventBus;
     private DatabaseService databaseService;
     private ApiService apiService;
 
+    // --- Wstrzykiwanie zależności ---
     public void setEventBus(EventBus eventBus) {
         this.eventBus = eventBus;
     }
-    public void setDatabaseService(DatabaseService databaseService) { this.databaseService = databaseService; }
-    public void setApiService(ApiService apiService) { this.apiService = apiService; }
 
+    public void setDatabaseService(DatabaseService databaseService) {
+        this.databaseService = databaseService;
+    }
+
+    public void setApiService(ApiService apiService) {
+        this.apiService = apiService;
+    }
 
     @FXML
     public void initialize() {
+        initMap();
+        initButtonHandlers();
+        initListSelectionHandlers();
+        initSearchHandling();
 
-        // Inicjalizacja WebView
+        Platform.runLater(() -> eventBus.post(new AppInitializedEvent()));
+    }
+
+    // --- Inicjalizacja mapy ---
+    private void initMap() {
         WebEngine webEngine = mapView.getEngine();
         webEngine.load(MainApp.class.getResource("view/map.html").toExternalForm());
 
-        // Ustawianie jsBridge
         webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 jsBridge = (JSObject) webEngine.executeScript("window");
@@ -66,67 +78,67 @@ public class MainController {
             }
         });
 
-        webEngine.setOnError(event -> {
-            System.out.println("JS Error: " + event.getMessage());
-        });
-        webEngine.setOnAlert(event -> {
-            System.out.println("JS Alert: " + event.getData());
-        });
-        webEngine.setOnStatusChanged(event -> {
-            System.out.println("JS Status: " + event.getData());
+        webEngine.setOnError(e -> System.out.println("JS Error: " + e.getMessage()));
+        webEngine.setOnAlert(e -> System.out.println("JS Alert: " + e.getData()));
+        webEngine.setOnStatusChanged(e -> System.out.println("JS Status: " + e.getData()));
+    }
+
+    // --- Obsługa przycisków ---
+    private void initButtonHandlers() {
+        searchButton.setOnAction(event -> {
+            String query = searchField.getText();
+            if (query != null && !query.isBlank()) {
+                eventBus.post(new StopSearchRequestedEvent(query));
+            }
         });
 
-        // Dodanie do ulubionych
+        getLinesButton.setOnAction(event -> {
+            Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
+            if (selectedStop != null) {
+                apiService.fetchLinesAsync(selectedStop.getId(), selectedStop.getStopNumber());
+            } else {
+                System.out.println("⚠️ Wybierz przystanek, aby pobrać linie.");
+            }
+        });
+
+        getDeparturesButton.setOnAction(event -> {
+            Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
+            Line selectedLine = lineList.getSelectionModel().getSelectedItem();
+            if (selectedStop != null && selectedLine != null) {
+                apiService.fetchDeparturesAsync(
+                        selectedStop.getId(),
+                        selectedStop.getStopNumber(),
+                        selectedLine.getLineNumber()
+                );
+            } else {
+                System.out.println("⚠️ Wybierz przystanek i linię, aby pobrać odjazdy.");
+            }
+        });
+
         addToFavoritesButton.setOnAction(event -> {
             Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
             if (selectedStop != null) {
                 try {
                     databaseService.addFavorite(selectedStop);
-                    this.updateFavoritesList(databaseService.getAllFavorites());
+                    updateFavoritesList(databaseService.getAllFavorites());
                 } catch (SQLException e) {
                     e.printStackTrace();
-                    // Możesz wysłać ApiErrorEvent albo pokazać komunikat w UI
                 }
             }
         });
 
-        // Usuwanie z polubionych
         removeFromFavoritesButton.setOnAction(event -> {
             Stop selectedStop = favoritesList.getSelectionModel().getSelectedItem();
             if (selectedStop != null) {
                 try {
                     databaseService.removeFavorite(selectedStop);
-                    List<Stop> updated = databaseService.getAllFavorites();
-                    this.updateFavoritesList(updated);
+                    updateFavoritesList(databaseService.getAllFavorites());
                 } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
             }
         });
 
-        // Obsługa przycisku "Szukaj"
-        searchButton.setOnAction(event -> {
-            String query = searchField.getText();
-            if (query != null) {
-                eventBus.post(new StopSearchRequestedEvent(query));
-            }
-        });
-
-        // Obsługa wyboru przystanku z listy (kliknięcie w item)
-        stopList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                eventBus.post(new StopSelectedEvent(newVal));
-            }
-        });
-
-        // Przypadek dla polubionych
-        favoritesList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                eventBus.post(new StopSelectedEvent(newVal));
-            }
-        });
-
-        // Obsługa kliknięcia "Powiadom o kursie" – opcjonalnie
         notifyButton.setOnAction(event -> {
             Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
             if (selectedStop != null) {
@@ -137,17 +149,22 @@ public class MainController {
                 alert.showAndWait();
             }
         });
+    }
 
-        searchField.setOnMouseClicked(event -> showRecentSearches());
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal.isEmpty()) {
-                showRecentSearches();
-            } else {
-                hideRecentSearches();
+    // --- Obsługa list wyboru ---
+    private void initListSelectionHandlers() {
+        stopList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                eventBus.post(new StopSelectedEvent(newVal));
             }
         });
 
-        // Pokazywanie listy wyszukiwań
+        favoritesList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                eventBus.post(new StopSelectedEvent(newVal));
+            }
+        });
+
         recentSearchesList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 searchField.setText(newVal.getQuery());
@@ -155,40 +172,45 @@ public class MainController {
                 eventBus.post(new StopSearchRequestedEvent(newVal.getQuery()));
             }
         });
-
-        Platform.runLater(() -> {
-            eventBus.post(new AppInitializedEvent());
-        });
-
     }
 
-    private void showError(String message) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Błąd");
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
+    // --- Obsługa wyszukiwania i historii ---
+    private void initSearchHandling() {
+        searchField.setOnMouseClicked(event -> showRecentSearches());
+
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal.isEmpty()) {
+                showRecentSearches();
+            } else {
+                hideRecentSearches();
+            }
         });
     }
 
-
-    public List<Stop> getAllStops() {
-        return allStops;
-    }
-
-    // Aktualizacja widoku przystanków
+    // --- Pomocnicze metody widoku ---
     public void updateStopList(List<Stop> stops) {
-        this.allStops = stops;
-        stopList.getItems().setAll(stops);
+        if (allStops.isEmpty()) {
+            allStops.addAll(stops); // tylko raz zapisujemy
+        }
+
+        List<Stop> formatted = stops.stream().map(stop -> {
+            if (stop.getStopNumber() != null && !stop.getStopNumber().isBlank()) {
+                return new Stop(
+                        stop.getId(),
+                        stop.getName() + " " + stop.getStopNumber(),
+                        stop.getLatitude(),
+                        stop.getLongitude(),
+                        stop.getStopNumber()
+                );
+            }
+            return stop;
+        }).toList();
+
+        stopList.getItems().setAll(formatted);
     }
 
-    // Aktaulizacja widoku polubionych przystanków
     public void updateFavoritesList(List<Stop> favorites) {
-        // Zakładamy, że masz osobny ListView na ulubione przystanki — np. favoritesListView
-        Platform.runLater(() -> {
-            favoritesList.getItems().setAll(favorites);
-        });
+        Platform.runLater(() -> favoritesList.getItems().setAll(favorites));
     }
 
     public void updateDepartureList(List<Departure> departures) {
@@ -199,19 +221,16 @@ public class MainController {
         lineList.getItems().setAll(lines);
     }
 
+    public void addRecentSearch(String query) {
+        recentSearches.removeIf(s -> s.getQuery().equalsIgnoreCase(query));
+        recentSearches.addFirst(new RecentSearch(query, LocalDateTime.now()));
 
+        if (recentSearches.size() > 10) {
+            recentSearches.removeLast();
+        }
 
-    /** Rysuje markery dla listy przystanków na mapie */
-    public void plotStopsOnMap(List<Stop> stops) {
-        // 1. Najpierw usuń istniejące markery
-        jsBridge.call("clearMarkers");
-        // 2. Dodaj nowe markery
-        for (Stop s : stops) {
-            String jsCode = String.format(
-                    "addMarker(%f, %f, '%s', '%s')",
-                    s.getLatitude(), s.getLongitude(), s.getId(), s.getName().replace("'", "\\'")
-            );
-            jsBridge.call("eval", jsCode);
+        if (recentSearchesList.isVisible()) {
+            Platform.runLater(() -> recentSearchesList.getItems().setAll(recentSearches));
         }
     }
 
@@ -226,25 +245,54 @@ public class MainController {
         recentSearchesList.setVisible(false);
     }
 
+    // --- Mapowe ---
+    public void onMapInitialized() {
+        this.mapInitialized = true;
+        System.out.println("Mapa została zainicjalizowana");
+    }
 
-    public void addRecentSearch(String query) {
-        Optional<RecentSearch> existing = recentSearches.stream()
-                .filter(s -> s.getQuery().equalsIgnoreCase(query))
-                .findFirst();
+    public boolean isMapInitialized() {
+        return mapInitialized;
+    }
 
-        existing.ifPresent(recentSearches::remove);
-        recentSearches.addFirst(new RecentSearch(query, LocalDateTime.now()));
+    public void setMapInitialized(boolean value) {
+        this.mapInitialized = value;
+    }
 
-        if (recentSearches.size() > 10) {
-            recentSearches.removeLast();
+    public void plotStopsOnMap(List<Stop> stops) {
+        if (!mapInitialized) {
+            System.out.println("Mapa jeszcze nie zainicjalizowana, pomijam plotStopsOnMap");
+            return;
         }
 
-        // Automatycznie uaktualnij widok
+        jsBridge.call("clearMarkers");
+        for (Stop s : stops) {
+            String jsCode = String.format(
+                    "addMarker(%f, %f, '%s', '%s')",
+                    s.getLatitude(), s.getLongitude(),
+                    s.getId(),
+                    s.getName().replace("'", "\\'")
+            );
+            jsBridge.call("eval", jsCode);
+        }
+    }
+
+    // --- Pomocnicze ---
+    private void showError(String message) {
         Platform.runLater(() -> {
-            if (recentSearchesList.isVisible()) {
-                recentSearchesList.getItems().setAll(recentSearches);
-            }
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Błąd");
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
         });
     }
 
+    public List<Stop> getAllStops() {
+        return allStops;
+    }
+
+    @FXML public void handleShowAllStops() {
+        // Zarezerwowane na przyszłość
+    }
 }

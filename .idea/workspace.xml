@@ -4,34 +4,19 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="05207925-d6ff-4957-9132-83f8a7c51e3b" name="Changes" comment="Added local SQLite storage for likes and search history">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/config/AppConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/AppInitializedEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/LinesLoadedEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/StopsLoadedEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/AppInitializedHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/LinesLoadedHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopsLoadedHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/model/Line.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/service/ApiService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/projectedp/config.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/projectedp/view/map.html" afterDir="false" />
+    <list default="true" id="05207925-d6ff-4957-9132-83f8a7c51e3b" name="Changes" comment="Added ApiService, OpenStreetMap view and working request for fetching stops">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/MainApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/MainApp.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/controller/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/controller/MainController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/NotificationRequestedEvent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/StopAddedToFavoritesEvent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/StopRemovedFromFavoritesEvent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/ApiErrorHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/ApiErrorHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/DeparturesLoadedHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/DeparturesLoadedHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/NotificationRequestedHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopAddedToFavoritesHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopRemovedFromFavoritesHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/LinesLoadedHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/LinesLoadedHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopSearchRequestedHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopSearchRequestedHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopSelectedHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopSelectedHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/model/Stop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/model/Stop.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/service/ApiService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/service/ApiService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/service/DatabaseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/service/DatabaseService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/projectedp/view/main.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/projectedp/view/main.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/projectedp/view/map.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/projectedp/view/map.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stops.db" beforeDir="false" afterPath="$PROJECT_DIR$/stops.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -105,26 +90,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.MainApp.executor": "Coverage",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Gradle.Build edp-public-transit.executor": "Run",
-    "Gradle.Load Gradle Dependencies.executor": "Run",
-    "Gradle.edp-public-transit [:MainApp.main()].executor": "Run",
-    "Gradle.edp-public-transit.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "feat/OpenStreetMap",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/User/IdeaProjects/edp-public-transit/src/main/java/com/example/projectedp",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.2",
-    "settings.build.tools.auto.reload": "ALL",
-    "settings.editor.selected.configurable": "build.tools"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.MainApp.executor&quot;: &quot;Coverage&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Gradle.Build edp-public-transit.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Load Gradle Dependencies.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.edp-public-transit [:MainApp.main()].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.edp-public-transit.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feat/OpenStreetMap&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/IdeaProjects/edp-public-transit/src/main/java/com/example/projectedp&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.build.tools.auto.reload&quot;: &quot;ALL&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;build.tools&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\User\IdeaProjects\edp-public-transit\src\main\java\com\example\projectedp" />
@@ -218,8 +203,27 @@
       <option name="project" value="LOCAL" />
       <updated>1749150326988</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Added ApiService, OpenStreetMap view and working request for fetching stops">
+      <option name="closed" value="true" />
+      <created>1749215797517</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1749215797517</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+        <option value="Space.CommitStatus" />
+      </list>
+    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -236,7 +240,8 @@
     <MESSAGE value="Rebuild project, added event and handler mockups" />
     <MESSAGE value="Added more events and stop search implementation" />
     <MESSAGE value="Added local SQLite storage for likes and search history" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added local SQLite storage for likes and search history" />
+    <MESSAGE value="Added ApiService, OpenStreetMap view and working request for fetching stops" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added ApiService, OpenStreetMap view and working request for fetching stops" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/projectEDP$MainApp.ic" NAME="MainApp Coverage Results" MODIFIED="1749122295961" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">

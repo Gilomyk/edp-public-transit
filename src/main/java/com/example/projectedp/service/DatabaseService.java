@@ -66,7 +66,8 @@ public class DatabaseService {
                         rs.getString("stop_id"),
                         rs.getString("name"),
                         rs.getDouble("latitude"),
-                        rs.getDouble("longitude")
+                        rs.getDouble("longitude"),
+                        rs.getString("longitude")
                 ));
             }
         }

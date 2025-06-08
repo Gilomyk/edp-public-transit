@@ -51,6 +51,5 @@ public class StopSearchRequestedHandler implements EventHandler<StopSearchReques
 
         // Aktualizacja listy w GUI
         controller.addRecentSearch(event.getQuery());
-        apiService.fetchStopsAsync();
     }
 }

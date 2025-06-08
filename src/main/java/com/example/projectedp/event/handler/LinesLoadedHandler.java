@@ -26,11 +26,12 @@ public class LinesLoadedHandler implements EventHandler<LinesLoadedEvent> {
         String busstopNr = event.getBusstopNr();
 
         // Jeśli mamy co najmniej jedną linię, od razu pobierz odjazdy pierwszej
-        if (lines != null && !lines.isEmpty()) {
-            String firstLine = lines.get(0).getLineNumber();
-            apiService.fetchDeparturesAsync(busstopId, busstopNr, firstLine);
-        }
+//        if (lines != null && !lines.isEmpty()) {
+//            String firstLine = lines.get(0).getLineNumber();
+//            apiService.fetchDeparturesAsync(busstopId, busstopNr, firstLine);
+//        }
 
+        System.out.println("IM HERE");
         // Możesz też wyświetlić listę linii w GUI, gdy dodasz widok (opcjonalnie):
         Platform.runLater(() -> controller.updateLineList(lines));
     }

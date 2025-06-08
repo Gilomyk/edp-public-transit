@@ -79,11 +79,18 @@ public class ApiService {
                 .GET()
                 .build();
 
-        httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+        System.out.println("Request: " + request);
+
+        HttpClient client = HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .build();
+
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
                     if (response.statusCode() == 200) {
                         try {
                             List<Line> lines = parseLinesJson(response.body());
+                            System.out.println("We got a line");
                             eventBus.post(new LinesLoadedEvent(lines, busstopId, busstopNr));
                         } catch (JsonSyntaxException ex) {
                             eventBus.post(new ApiErrorEvent("Błąd parsowania JSON linii: " + ex.getMessage()));
@@ -107,7 +114,13 @@ public class ApiService {
                 .GET()
                 .build();
 
-        httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+        System.out.println("Request: " + request);
+
+        HttpClient client = HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .build();
+
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
                     if (response.statusCode() == 200) {
                         try {
@@ -140,18 +153,15 @@ public class ApiService {
 
                     // Wyciągamy z niej odpowiednie pola:
                     String zespol   = vals.get(0).getAsJsonObject().get("value").getAsString();   // np. "1001"
-                    String slupek   = vals.get(1).getAsJsonObject().get("value").getAsString();   // np. "01"
                     String nazwa    = vals.get(2).getAsJsonObject().get("value").getAsString();   // np. "Kijowska"
                     String szerGeo  = vals.get(4).getAsJsonObject().get("value").getAsString();   // np. "52.248455"
                     String dlugGeo  = vals.get(5).getAsJsonObject().get("value").getAsString();   // np. "21.044827"
+                    String slupek   = vals.get(1).getAsJsonObject().get("value").getAsString();   // np. "01"
 
                     double lat = Double.parseDouble(szerGeo);
                     double lon = Double.parseDouble(dlugGeo);
 
-                    // Możemy sklasyfikować id przystanku jako "zespol-slupek"
-                    String stopId = zespol + "-" + slupek;
-
-                    return new Stop(stopId, nazwa, lat, lon);
+                    return new Stop(zespol, nazwa, lat, lon, slupek);
                 })
                 .collect(Collectors.toList());
     }

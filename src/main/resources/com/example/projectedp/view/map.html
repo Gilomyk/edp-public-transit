@@ -6,7 +6,7 @@
 
     <!-- ✨ Import Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"
-          integrity="sha512‐xwE/NgDkaB1v/B1Wf58T22LPMc+TsVGbWF5SDrM7JoMmEldQysUKyaek7Skw0pP4h++vCZW3BrN9QY4uS+YQmA=="
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossorigin=""/>
 
     <style>
@@ -19,7 +19,7 @@
 
     <!-- ✨ Import Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"
-            integrity="sha512‐gZwIG9x3wUXgL4WVjZXjKC6BwX+c+hOLOWjix8ZDebIG6nSY1hYC5VxZpjM6dMUpRoIGVGIGFXz4ZMZq2mMlQw=="
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
             crossorigin=""></script>
 
     <script>
@@ -30,6 +30,8 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
         }).addTo(map);
+
+        console.log("added kafelken");
 
         // Tablica przechowująca markery, by można było nimi zarządzać
         var markers = {};
@@ -67,7 +69,13 @@
 
         // Po pełnym załadowaniu, informujemy Javę
         document.addEventListener('DOMContentLoaded', function() {
-            mapLoaded();
+            // Czekamy aż 'app' zostanie ustawione przez Java
+            const interval = setInterval(() => {
+                if (window.app && typeof app.onMapInitialized === 'function') {
+                    clearInterval(interval);
+                    app.onMapInitialized();
+                }
+            }, 100); // sprawdzaj co 100ms
         });
     </script>
 
