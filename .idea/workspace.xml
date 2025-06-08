@@ -4,18 +4,11 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="05207925-d6ff-4957-9132-83f8a7c51e3b" name="Changes" comment="Added ApiService, OpenStreetMap view and working request for fetching stops">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="05207925-d6ff-4957-9132-83f8a7c51e3b" name="Changes" comment="add all .idea/ to gitignore">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/MainApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/MainApp.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/controller/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/controller/MainController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/DeparturesLoadedHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/DeparturesLoadedHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/LinesLoadedHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/LinesLoadedHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopSearchRequestedHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/event/handler/StopSearchRequestedHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/model/Stop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/model/Stop.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/service/ApiService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/service/ApiService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/projectedp/service/DatabaseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/projectedp/service/DatabaseService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/projectedp/view/main.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/projectedp/view/main.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/projectedp/view/map.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/projectedp/view/map.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stops.db" beforeDir="false" afterPath="$PROJECT_DIR$/stops.db" afterDir="false" />
     </list>
@@ -65,8 +58,12 @@
       <list>
         <option value="HTML File" />
         <option value="Class" />
+        <option value="FxmlFile" />
       </list>
     </option>
+  </component>
+  <component name="Git.Merge.Settings">
+    <option name="BRANCH" value="origin/feat/OpenStreetMap" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -107,7 +104,7 @@
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
     &quot;settings.build.tools.auto.reload&quot;: &quot;ALL&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;build.tools&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -151,6 +148,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.MainApp" />
         <item itemvalue="Application.MainApp" />
       </list>
     </recent_temporary>

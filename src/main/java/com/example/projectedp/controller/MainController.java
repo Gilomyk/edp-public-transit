@@ -75,12 +75,16 @@ public class MainController {
             if (newState == Worker.State.SUCCEEDED) {
                 jsBridge = (JSObject) webEngine.executeScript("window");
                 jsBridge.setMember("app", this);
+//                webEngine.executeScript("addMarker(52.2297, 21.0122, '1', 'Warszawa')");
             }
         });
 
         webEngine.setOnError(e -> System.out.println("JS Error: " + e.getMessage()));
         webEngine.setOnAlert(e -> System.out.println("JS Alert: " + e.getData()));
         webEngine.setOnStatusChanged(e -> System.out.println("JS Status: " + e.getData()));
+
+
+
     }
 
     // --- Obsługa przycisków ---
@@ -101,19 +105,19 @@ public class MainController {
             }
         });
 
-        getDeparturesButton.setOnAction(event -> {
-            Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
-            Line selectedLine = lineList.getSelectionModel().getSelectedItem();
-            if (selectedStop != null && selectedLine != null) {
-                apiService.fetchDeparturesAsync(
-                        selectedStop.getId(),
-                        selectedStop.getStopNumber(),
-                        selectedLine.getLineNumber()
-                );
-            } else {
-                System.out.println("⚠️ Wybierz przystanek i linię, aby pobrać odjazdy.");
-            }
-        });
+//        getDeparturesButton.setOnAction(event -> {
+//            Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
+//            Line selectedLine = lineList.getSelectionModel().getSelectedItem();
+//            if (selectedStop != null && selectedLine != null) {
+//                apiService.fetchDeparturesAsync(
+//                        selectedStop.getId(),
+//                        selectedStop.getStopNumber(),
+//                        selectedLine.getLineNumber()
+//                );
+//            } else {
+//                System.out.println("⚠️ Wybierz przystanek i linię, aby pobrać odjazdy.");
+//            }
+//        });
 
         addToFavoritesButton.setOnAction(event -> {
             Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
@@ -259,23 +263,47 @@ public class MainController {
         this.mapInitialized = value;
     }
 
+//    public void plotStopsOnMap(List<Stop> stops) {
+//        if (!mapInitialized) {
+//            System.out.println("Mapa jeszcze nie zainicjalizowana, pomijam plotStopsOnMap");
+//            return;
+//        }
+//
+//        jsBridge.call("clearMarkers");
+//        for (Stop s : stops) {
+//            String jsCode = String.format(
+//                    "addMarker(%f, %f, '%s', '%s')",
+//                    s.getLatitude(), s.getLongitude(),
+//                    s.getId(),
+//                    s.getName().replace("'", "\\'")
+//            );
+//            jsBridge.call("eval", jsCode);
+//        }
+//    }
+
     public void plotStopsOnMap(List<Stop> stops) {
         if (!mapInitialized) {
             System.out.println("Mapa jeszcze nie zainicjalizowana, pomijam plotStopsOnMap");
             return;
         }
 
-        jsBridge.call("clearMarkers");
-        for (Stop s : stops) {
-            String jsCode = String.format(
-                    "addMarker(%f, %f, '%s', '%s')",
-                    s.getLatitude(), s.getLongitude(),
-                    s.getId(),
-                    s.getName().replace("'", "\\'")
-            );
-            jsBridge.call("eval", jsCode);
-        }
+        Platform.runLater(() -> {
+            WebEngine webEngine = mapView.getEngine();
+            webEngine.executeScript("clearMarkers();");
+            for (Stop s : stops) {
+                String jsCode = String.format(Locale.US,
+                        "addMarker(%f, %f, '%s', '%s');",
+                        s.getLatitude(),
+                        s.getLongitude(),
+                        s.getId(),
+                        s.getName().replace("'", "\\'")
+                );
+//                System.out.println(jsCode);
+                webEngine.executeScript(jsCode);
+            }
+        });
     }
+
 
     // --- Pomocnicze ---
     private void showError(String message) {

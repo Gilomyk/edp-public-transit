@@ -13,6 +13,7 @@
         /* Map container musi mieć wysokość */
         #map { height: 100vh; margin: 0; padding: 0; }
     </style>
+    <title></title>
 </head>
 <body>
     <div id="map"></div>
@@ -31,13 +32,14 @@
             attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        console.log("added kafelken");
-
         // Tablica przechowująca markery, by można było nimi zarządzać
         var markers = {};
 
+        alert('Markers:' + markers);
+
         // 3. Funkcja dodająca marker na mapie (wywoływana z Java)
         function addMarker(lat, lon, stopId, stopName) {
+<!--            alert(lat, lon, stopId, stopName)-->
             // Jeśli marker o tym ID już jest, nie dodawaj ponownie
             if (markers[stopId]) return;
 

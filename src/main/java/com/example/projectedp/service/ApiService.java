@@ -9,8 +9,10 @@ import java.net.http.*;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 public class ApiService {
     private final HttpClient httpClient = HttpClient.newHttpClient();
@@ -106,38 +108,50 @@ public class ApiService {
     }
 
     /** Asynchronicznie pobierz odjazdy dla danego przystanku (stopId) */
-    public void fetchDeparturesAsync(String busstopId, String busstopNr, String line) {
-        String uri = String.format("%s/%s&busstopId=%s&busstopNr=%s&line=%s&apikey=%s",
-                baseUrl, resourceDepartures, busstopId, busstopNr, line, apiKey);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uri))
-                .GET()
-                .build();
+    public void fetchDeparturesAsync(String busstopId, String busstopNr, List<Line> lines) {
 
-        System.out.println("Request: " + request);
+        List<CompletableFuture<List<Departure>>> futures = lines.stream()
+                .map(line -> {
+                    String uri = String.format("%s/%s&busstopId=%s&busstopNr=%s&line=%s&apikey=%s",
+                            baseUrl, resourceDepartures, busstopId, busstopNr, line.getLineNumber(), apiKey);
+                    HttpRequest request = HttpRequest.newBuilder()
+                            .uri(URI.create(uri))
+                            .GET()
+                            .build();
 
-        HttpClient client = HttpClient.newBuilder()
-                .followRedirects(HttpClient.Redirect.NORMAL)
-                .build();
+//                    System.out.println("Request: " + request);
 
-        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenAccept(response -> {
-                    if (response.statusCode() == 200) {
-                        try {
-                            List<Departure> deps = parseDeparturesJson(response.body());
-                            eventBus.post(new DeparturesLoadedEvent(deps));
-                        } catch (JsonSyntaxException ex) {
-                            eventBus.post(new ApiErrorEvent("Błąd parsowania JSON odjazdów: " + ex.getMessage()));
-                        }
-                    } else {
-                        eventBus.post(new ApiErrorEvent("Błąd HTTP przy fetchDepartures: " + response.statusCode()));
-                    }
+                    HttpClient client = HttpClient.newBuilder()
+                            .followRedirects(HttpClient.Redirect.NORMAL)
+                            .build();
+
+                    return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                            .thenApply(response -> {
+                                if (response.statusCode() == 200) {
+                                    List<Departure> deps = parseDeparturesJson(response.body(), line.getLineNumber());
+                                    return deps;
+                                } else {
+                                    eventBus.post(new ApiErrorEvent("Błąd HTTP przy fetchDepartures: " + response.statusCode()));
+                                    return null;
+                                }
+                            }).exceptionally(ex -> {
+                                eventBus.post(new ApiErrorEvent("Wyjątek podczas fetchDepartures: " + ex.getMessage()));
+                                return Collections.emptyList();
+                            });
                 })
-                .exceptionally(ex -> {
-                    eventBus.post(new ApiErrorEvent("Wyjątek podczas fetchDepartures: " + ex.getMessage()));
-                    return null;
-                });
+                .toList();
+
+        CompletableFuture
+                .allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v ->
+                        futures.stream()
+                                .map(CompletableFuture::join)
+                                .flatMap(List::stream)
+                                .collect(Collectors.toList())
+                )
+                .thenAccept(departures -> eventBus.post(new DeparturesLoadedEvent(departures)));
     }
+
 
     /** Parsuje JSON z dbstore_get (lista przystanków). */
     private List<Stop> parseStopsJson(String json) {
@@ -191,7 +205,7 @@ public class ApiService {
 
 
     /** Parsuje JSON z dbtimetable_get (lista odjazdów dla konkretnej linii). */
-    private List<Departure> parseDeparturesJson(String json) {
+    private List<Departure> parseDeparturesJson(String json, String line) {
         JsonArray result = JsonParser.parseString(json)
                 .getAsJsonObject()
                 .getAsJsonArray("result");
@@ -207,7 +221,6 @@ public class ApiService {
                                     obj -> obj.get("value").isJsonNull() ? "" : obj.get("value").getAsString()
                             ));
 
-                    String line = valueMap.getOrDefault("linia", "");
                     String kierunek = valueMap.getOrDefault("kierunek", "");
                     String czasStr = valueMap.getOrDefault("czas", "00:00:00");
 
