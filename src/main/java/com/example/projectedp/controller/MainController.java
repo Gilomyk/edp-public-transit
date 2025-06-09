@@ -1,6 +1,10 @@
 package com.example.projectedp.controller;
 
 import com.example.projectedp.MainApp;
+import com.example.projectedp.dao.FavoriteStopDao;
+import com.example.projectedp.dao.FavoriteStopDaoImpl;
+import com.example.projectedp.dao.SearchHistoryDao;
+import com.example.projectedp.dao.SearchHistoryDaoImpl;
 import com.example.projectedp.event.*;
 import com.example.projectedp.model.*;
 import com.example.projectedp.service.*;
@@ -47,7 +51,7 @@ public class MainController {
     private JSObject jsBridge;
     private boolean mapInitialized = false;
     private EventBus eventBus;
-    private DatabaseService databaseService;
+    private FavoriteStopDao favoriteStopDao = FavoriteStopDaoImpl.getInstance();;
     private ApiService apiService;
     private Boolean showFavorites = false;
 
@@ -56,9 +60,10 @@ public class MainController {
         this.eventBus = eventBus;
     }
 
-    public void setDatabaseService(DatabaseService databaseService) {
-        this.databaseService = databaseService;
-    }
+//    public void setDatabaseService(DatabaseService databaseService) {
+//        this.databaseService = databaseService;
+//    }
+
 
     public void setApiService(ApiService apiService) {
         this.apiService = apiService;
@@ -92,10 +97,8 @@ public class MainController {
         webEngine.setOnError(e -> System.out.println("JS Error: " + e.getMessage()));
         webEngine.setOnAlert(e -> System.out.println("JS Alert: " + e.getData()));
         webEngine.setOnStatusChanged(e -> System.out.println("JS Status: " + e.getData()));
-
-
-
     }
+
 
     // --- Obsługa przycisków ---
     private void initButtonHandlers() {
@@ -107,8 +110,13 @@ public class MainController {
         });
 
         getLinesButton.setOnAction(event -> {
-            Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
-            Stop selectedFavouriteStop = favoritesList.getSelectionModel().getSelectedItem();
+            Stop selectedStop;
+            if (!showFavorites){
+                selectedStop = stopList.getSelectionModel().getSelectedItem();
+            } else {
+                selectedStop = favoritesList.getSelectionModel().getSelectedItem();
+                System.out.println("tutaj");
+            }
             if (selectedStop != null) {
                 apiService.fetchLinesAsync(selectedStop.getId(), selectedStop.getStopNumber());
             } else {
@@ -122,8 +130,8 @@ public class MainController {
             Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
             if (selectedStop != null) {
                 try {
-                    databaseService.addFavorite(selectedStop);
-                    updateFavoritesList(databaseService.getAllFavorites());
+                    favoriteStopDao.add(selectedStop);
+                    updateFavoritesList(favoriteStopDao.getAll());
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -134,8 +142,8 @@ public class MainController {
             Stop selectedStop = favoritesList.getSelectionModel().getSelectedItem();
             if (selectedStop != null) {
                 try {
-                    databaseService.removeFavorite(selectedStop);
-                    updateFavoritesList(databaseService.getAllFavorites());
+                    favoriteStopDao.remove(selectedStop);
+                    updateFavoritesList(favoriteStopDao.getAll());
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

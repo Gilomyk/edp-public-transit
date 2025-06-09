@@ -1,12 +1,17 @@
 package com.example.projectedp;
 
 import com.example.projectedp.controller.MainController;
+import com.example.projectedp.dao.FavoriteStopDao;
+import com.example.projectedp.dao.FavoriteStopDaoImpl;
+import com.example.projectedp.dao.SearchHistoryDaoImpl;
+import com.example.projectedp.dao.DatabaseManager;
 import com.example.projectedp.event.*;
 import com.example.projectedp.event.handler.*;
 import com.example.projectedp.service.*;
 import com.example.projectedp.model.*;
 import com.example.projectedp.util.EventHandlerLoader;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -22,54 +27,24 @@ public class MainApp extends Application {
     public void start(Stage stage) throws IOException, SQLException {
         FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("view/main.fxml"));
         Parent root = loader.load();
+        DatabaseManager.getConnection();
 
-        DatabaseService db = new DatabaseService();
-        db.init();
+        FavoriteStopDaoImpl.getInstance();
+        SearchHistoryDaoImpl.getInstance();
 
         EventBus eventBus = new EventBus();
 
         ApiService apiService = new ApiService(eventBus);
 
-        // Przekazanie EventBus do kontrolera
         MainController controller = loader.getController();
         controller.setEventBus(eventBus);
-        controller.setDatabaseService(db);
         controller.setApiService(apiService);
 
-        List<Stop> favs = db.getAllFavorites();
-        controller.updateFavoritesList(favs);
+        FavoriteStopDao favoriteStopDao = FavoriteStopDaoImpl.getInstance();
+        List<Stop> favorites = favoriteStopDao.getAll();
+        Platform.runLater(() -> controller.updateFavoritesList(favorites));
 
-//        // Rejestracja handlerów
-//        // 1) StopSearchRequestedEvent → StopSearchRequestedHandler (filtracja + zapis w bazie + cache)
-//        eventBus.register(StopSearchRequestedEvent.class,
-//                new StopSearchRequestedHandler(db, controller, apiService));
-//
-//        // 2) StopSelectedEvent → StopSelectedHandler (wywołuje pobranie odjazdów)
-//                eventBus.register(StopSelectedEvent.class,
-//                        new StopSelectedHandler(apiService, controller));
-//
-//        // 3) StopsLoadedEvent → StopsLoadedHandler (aktualizacja listy i mapy przystanków)
-//                eventBus.register(StopsLoadedEvent.class,
-//                        new StopsLoadedHandler(controller));
-//
-//        // 4) DeparturesLoadedEvent → DeparturesLoadedHandler (aktualizacja listy odjazdów)
-//                eventBus.register(DeparturesLoadedEvent.class,
-//                        new DeparturesLoadedHandler(controller));
-//
-//        // 5) ApiErrorEvent → ApiErrorHandler (pokazywanie alertów)
-//                eventBus.register(ApiErrorEvent.class,
-//                        new ApiErrorHandler());
-//
-//        // 6) Inicjalizacja danych
-//                eventBus.register(AppInitializedEvent.class, new AppInitializedHandler(controller, apiService, db));
-//
-//        // 7) Lista linii autobusowych
-//        eventBus.register(LinesLoadedEvent.class,
-//                new LinesLoadedHandler(apiService, controller));
-
-        // Zamiana na loader
         Map<Class<?>, Object> dependencies = Map.of(
-                DatabaseService.class, db,
                 MainController.class, controller,
                 ApiService.class, apiService
         );

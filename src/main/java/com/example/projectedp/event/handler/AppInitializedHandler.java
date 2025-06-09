@@ -1,6 +1,10 @@
 package com.example.projectedp.event.handler;
 
 import com.example.projectedp.controller.MainController;
+import com.example.projectedp.dao.FavoriteStopDao;
+import com.example.projectedp.dao.FavoriteStopDaoImpl;
+import com.example.projectedp.dao.SearchHistoryDao;
+import com.example.projectedp.dao.SearchHistoryDaoImpl;
 import com.example.projectedp.event.AppInitializedEvent;
 import com.example.projectedp.event.EventHandler;
 import com.example.projectedp.event.Handles;
@@ -21,12 +25,12 @@ public class AppInitializedHandler implements EventHandler<AppInitializedEvent> 
 
     private final MainController controller;
     private final ApiService apiService;
-    private final DatabaseService databaseService;
+    private FavoriteStopDao favoriteStopDao;
 
-    public AppInitializedHandler(MainController controller, ApiService apiService, DatabaseService databaseService) {
+    public AppInitializedHandler(MainController controller, ApiService apiService) { // bez databaseService
         this.controller = controller;
         this.apiService = apiService;
-        this.databaseService = databaseService;
+        this.favoriteStopDao = FavoriteStopDaoImpl.getInstance();
     }
 
     @Override
@@ -37,7 +41,8 @@ public class AppInitializedHandler implements EventHandler<AppInitializedEvent> 
 
         // 2. Ładowanie ulubionych z DB
         try {
-            List<Stop> favorites = databaseService.getAllFavorites();
+//            List<Stop> favorites = databaseService.getAllFavorites();
+            List<Stop> favorites = favoriteStopDao.getAll();
             Platform.runLater(() -> controller.updateFavoritesList(favorites));
         } catch (SQLException e) {
             e.printStackTrace();

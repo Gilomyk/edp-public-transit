@@ -1,5 +1,7 @@
 package com.example.projectedp.event.handler;
 
+import com.example.projectedp.dao.SearchHistoryDao;
+import com.example.projectedp.dao.SearchHistoryDaoImpl;
 import com.example.projectedp.event.EventHandler;
 import com.example.projectedp.event.Handles;
 import com.example.projectedp.event.StopSearchRequestedEvent;
@@ -14,15 +16,15 @@ import java.sql.SQLException;
 
 @Handles(StopSearchRequestedEvent.class)
 public class StopSearchRequestedHandler implements EventHandler<StopSearchRequestedEvent>{
-
-    private final DatabaseService databaseService;
+    private SearchHistoryDao searchHistoryDao;
     private final MainController controller;
     private final ApiService apiService;
 
-    public StopSearchRequestedHandler(DatabaseService databaseService, MainController controller, ApiService apiService) {
-        this.databaseService = databaseService;
+    public StopSearchRequestedHandler(MainController controller, ApiService apiService) {
+//        this.databaseService = databaseService;
         this.controller = controller;
         this.apiService = apiService;
+        this.searchHistoryDao = SearchHistoryDaoImpl.getInstance();
     }
     @Override
     public void handle(StopSearchRequestedEvent event) {
@@ -31,7 +33,8 @@ public class StopSearchRequestedHandler implements EventHandler<StopSearchReques
         // 1) Zapis do historii w bazie
         if (!query.isEmpty()) {
             try {
-                databaseService.saveSearchQuery(query);
+                searchHistoryDao.saveQuery(query);
+
             } catch (SQLException e) {
                 e.printStackTrace();
             }
