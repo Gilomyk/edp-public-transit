@@ -2,9 +2,11 @@ package com.example.projectedp.event.handler;
 
 import com.example.projectedp.event.ApiErrorEvent;
 import com.example.projectedp.event.EventHandler;
+import com.example.projectedp.event.Handles;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
+@Handles(ApiErrorEvent.class)
 public class ApiErrorHandler implements EventHandler<ApiErrorEvent> {
 
     @Override

@@ -1,11 +1,13 @@
 package com.example.projectedp.event.handler;
 
 import com.example.projectedp.event.EventHandler;
+import com.example.projectedp.event.Handles;
 import com.example.projectedp.event.StopSelectedEvent;
 import com.example.projectedp.model.Stop;
 import com.example.projectedp.service.ApiService;
 import com.example.projectedp.controller.MainController;
 
+@Handles(StopSelectedEvent.class)
 public class StopSelectedHandler implements EventHandler<StopSelectedEvent> {
 
     private final ApiService apiService;

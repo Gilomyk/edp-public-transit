@@ -43,6 +43,9 @@ dependencies {
     implementation "org.openjfx:javafx-fxml:19.0.2:win"
     implementation "org.openjfx:javafx-web:19.0.2:win"
     implementation "org.openjfx:javafx-media:19.0.2:win"
+    implementation 'org.reflections:reflections:0.10.2'
+    implementation 'com.google.guava:guava:32.1.2-jre'
+    implementation 'org.slf4j:slf4j-simple:2.0.9'
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")

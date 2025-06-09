@@ -5,6 +5,7 @@ import com.example.projectedp.event.*;
 import com.example.projectedp.event.handler.*;
 import com.example.projectedp.service.*;
 import com.example.projectedp.model.*;
+import com.example.projectedp.util.EventHandlerLoader;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,6 +15,7 @@ import java.sql.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class MainApp extends Application {
     @Override
@@ -37,32 +39,42 @@ public class MainApp extends Application {
         List<Stop> favs = db.getAllFavorites();
         controller.updateFavoritesList(favs);
 
-        // Rejestracja handlerów
-        // 1) StopSearchRequestedEvent → StopSearchRequestedHandler (filtracja + zapis w bazie + cache)
-        eventBus.register(StopSearchRequestedEvent.class,
-                new StopSearchRequestedHandler(db, controller, apiService));
+//        // Rejestracja handlerów
+//        // 1) StopSearchRequestedEvent → StopSearchRequestedHandler (filtracja + zapis w bazie + cache)
+//        eventBus.register(StopSearchRequestedEvent.class,
+//                new StopSearchRequestedHandler(db, controller, apiService));
+//
+//        // 2) StopSelectedEvent → StopSelectedHandler (wywołuje pobranie odjazdów)
+//                eventBus.register(StopSelectedEvent.class,
+//                        new StopSelectedHandler(apiService, controller));
+//
+//        // 3) StopsLoadedEvent → StopsLoadedHandler (aktualizacja listy i mapy przystanków)
+//                eventBus.register(StopsLoadedEvent.class,
+//                        new StopsLoadedHandler(controller));
+//
+//        // 4) DeparturesLoadedEvent → DeparturesLoadedHandler (aktualizacja listy odjazdów)
+//                eventBus.register(DeparturesLoadedEvent.class,
+//                        new DeparturesLoadedHandler(controller));
+//
+//        // 5) ApiErrorEvent → ApiErrorHandler (pokazywanie alertów)
+//                eventBus.register(ApiErrorEvent.class,
+//                        new ApiErrorHandler());
+//
+//        // 6) Inicjalizacja danych
+//                eventBus.register(AppInitializedEvent.class, new AppInitializedHandler(controller, apiService, db));
+//
+//        // 7) Lista linii autobusowych
+//        eventBus.register(LinesLoadedEvent.class,
+//                new LinesLoadedHandler(apiService, controller));
 
-        // 2) StopSelectedEvent → StopSelectedHandler (wywołuje pobranie odjazdów)
-                eventBus.register(StopSelectedEvent.class,
-                        new StopSelectedHandler(apiService, controller));
+        // Zamiana na loader
+        Map<Class<?>, Object> dependencies = Map.of(
+                DatabaseService.class, db,
+                MainController.class, controller,
+                ApiService.class, apiService
+        );
 
-        // 3) StopsLoadedEvent → StopsLoadedHandler (aktualizacja listy i mapy przystanków)
-                eventBus.register(StopsLoadedEvent.class,
-                        new StopsLoadedHandler(controller));
-
-        // 4) DeparturesLoadedEvent → DeparturesLoadedHandler (aktualizacja listy odjazdów)
-                eventBus.register(DeparturesLoadedEvent.class,
-                        new DeparturesLoadedHandler(controller));
-
-        // 5) ApiErrorEvent → ApiErrorHandler (pokazywanie alertów)
-                eventBus.register(ApiErrorEvent.class,
-                        new ApiErrorHandler());
-
-        // 6) Inicjalizacja danych
-                eventBus.register(AppInitializedEvent.class, new AppInitializedHandler(controller, apiService, db));
-
-        eventBus.register(LinesLoadedEvent.class,
-                new LinesLoadedHandler(apiService, controller));
+        EventHandlerLoader.loadHandlers(eventBus, "com.example.projectedp", dependencies);
 
         stage.setTitle("Rozkład jazdy 3000");
         Scene scene = new Scene(root, 1600, 800);

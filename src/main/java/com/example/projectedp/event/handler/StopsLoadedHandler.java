@@ -1,6 +1,7 @@
 package com.example.projectedp.event.handler;
 
 import com.example.projectedp.event.EventHandler;
+import com.example.projectedp.event.Handles;
 import com.example.projectedp.event.StopsLoadedEvent;
 import com.example.projectedp.model.Stop;
 import com.example.projectedp.controller.MainController;
@@ -12,6 +13,7 @@ import java.util.List;
  * Handler reagujący na event StopsLoadedEvent – aktualizuje listę przystanków w MainController
  * i rysuje markery na mapie.
  */
+@Handles(StopsLoadedEvent.class)
 public class StopsLoadedHandler implements EventHandler<StopsLoadedEvent> {
 
     private final MainController controller;

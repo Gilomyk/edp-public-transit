@@ -9,6 +9,8 @@ module com.example.projectedp {
     requires java.net.http;
     requires com.google.gson;
     requires jdk.jsobject;
+    requires org.reflections;
+    requires org.slf4j;
 
     opens com.example.projectedp to javafx.fxml;
     opens com.example.projectedp.controller to javafx.fxml;

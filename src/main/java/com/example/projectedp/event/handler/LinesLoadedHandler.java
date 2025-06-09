@@ -1,6 +1,7 @@
 package com.example.projectedp.event.handler;
 
 import com.example.projectedp.event.EventHandler;
+import com.example.projectedp.event.Handles;
 import com.example.projectedp.event.LinesLoadedEvent;
 import com.example.projectedp.model.Line;
 import com.example.projectedp.service.ApiService;
@@ -9,6 +10,7 @@ import javafx.application.Platform;
 
 import java.util.List;
 
+@Handles(LinesLoadedEvent.class)
 public class LinesLoadedHandler implements EventHandler<LinesLoadedEvent> {
 
     private final ApiService apiService;

@@ -2,6 +2,7 @@ package com.example.projectedp.event.handler;
 
 import com.example.projectedp.event.EventHandler;
 import com.example.projectedp.event.DeparturesLoadedEvent;
+import com.example.projectedp.event.Handles;
 import com.example.projectedp.model.Departure;
 import com.example.projectedp.controller.MainController;
 import com.example.projectedp.model.Line;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
  * Handler reagujący na zdarzenie pobrania listy odjazdów.
  * Aktualizuje GUI (ListView odjazdów).
  */
+@Handles(DeparturesLoadedEvent.class)
 public class DeparturesLoadedHandler implements EventHandler<DeparturesLoadedEvent> {
 
     private final MainController controller;
