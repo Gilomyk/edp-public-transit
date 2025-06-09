@@ -8,11 +8,14 @@ import com.example.projectedp.service.*;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -62,6 +65,7 @@ public class MainController {
         initButtonHandlers();
         initListSelectionHandlers();
         initSearchHandling();
+        initDepartureListView();
 
         Platform.runLater(() -> eventBus.post(new AppInitializedEvent()));
     }
@@ -191,6 +195,35 @@ public class MainController {
         });
     }
 
+    private void initDepartureListView() {
+        departureList.setCellFactory(listView -> new ListCell<>() {
+            @Override
+            protected void updateItem(Departure departure, boolean empty) {
+                super.updateItem(departure, empty);
+                if (empty || departure == null) {
+                    setGraphic(null);
+                } else {
+                    try {
+                        FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("component/DepartureCard.fxml"));
+                        HBox card = loader.load();
+
+                        DepartureCardController controller = loader.getController();
+                        controller.setData(departure.getLine(), departure.getDestination(), departure.getTime());
+
+                        setGraphic(card);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        setGraphic(new Label("Błąd ładowania widoku"));
+                    }
+                }
+            }
+        });
+    }
+
+    public ListView<Departure> getDepartureList() {
+        return departureList;
+    }
+
     // --- Pomocnicze metody widoku ---
     public void updateStopList(List<Stop> stops) {
         if (allStops.isEmpty()) {
@@ -262,24 +295,6 @@ public class MainController {
     public void setMapInitialized(boolean value) {
         this.mapInitialized = value;
     }
-
-//    public void plotStopsOnMap(List<Stop> stops) {
-//        if (!mapInitialized) {
-//            System.out.println("Mapa jeszcze nie zainicjalizowana, pomijam plotStopsOnMap");
-//            return;
-//        }
-//
-//        jsBridge.call("clearMarkers");
-//        for (Stop s : stops) {
-//            String jsCode = String.format(
-//                    "addMarker(%f, %f, '%s', '%s')",
-//                    s.getLatitude(), s.getLongitude(),
-//                    s.getId(),
-//                    s.getName().replace("'", "\\'")
-//            );
-//            jsBridge.call("eval", jsCode);
-//        }
-//    }
 
     public void plotStopsOnMap(List<Stop> stops) {
         if (!mapInitialized) {

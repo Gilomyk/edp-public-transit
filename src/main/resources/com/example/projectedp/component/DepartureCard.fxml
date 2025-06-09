@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<HBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.projectedp.controller.DepartureCardController"
+      spacing="10" alignment="CENTER_LEFT"
+      style="-fx-background-color: #f8f8f8; -fx-padding: 10; -fx-border-color: #ccc; -fx-border-radius: 6; -fx-background-radius: 6;">
+
+    <VBox spacing="4">
+        <Text fx:id="lineText" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+        <Text fx:id="destinationText" style="-fx-font-size: 14px;" />
+    </VBox>
+
+    <Region HBox.hgrow="ALWAYS"/>
+
+    <VBox spacing="4" alignment="CENTER_RIGHT">
+        <Text fx:id="departureTimeText" style="-fx-font-size: 16px;" />
+        <Text fx:id="countdownText" style="-fx-font-size: 12px; -fx-fill: #777;" />
+    </VBox>
+</HBox>
