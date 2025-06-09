@@ -3,49 +3,44 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
-
 <?import javafx.scene.web.WebView?>
+
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.projectedp.controller.MainController">
 
     <top>
         <VBox spacing="5">
             <padding>
-                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+                <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
 
-            <!-- Rząd: pole + przycisk -->
             <HBox spacing="10">
                 <TextField fx:id="searchField" promptText="Wpisz nazwę przystanku..." HBox.hgrow="ALWAYS"/>
                 <Button fx:id="searchButton" text="Szukaj"/>
             </HBox>
 
-            <!-- Lista ostatnich wyszukiwań -->
-            <ListView fx:id="recentSearchesList" visible="false" maxHeight="100.0"/>
+            <ListView fx:id="recentSearchesList" visible="false" maxHeight="100"/>
         </VBox>
     </top>
 
-
     <center>
-        <SplitPane dividerPositions="0.2">
-            <VBox spacing="5">
-                <padding>
-                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-                </padding>
-                <Label text="Ulubione przystanki"/>
-                <ListView fx:id="favoritesList"/>
-                <Button text="Pokaż wszystkie" onAction="#handleShowAllStops"/>
-                <Button fx:id="removeFromFavoritesButton" text="🗑️ Usuń z ulubionych"/>
-            </VBox>
+        <SplitPane dividerPositions="0.15,0.35,0.50">
 
             <VBox spacing="5">
                 <padding>
                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
                 </padding>
-                <Label text="Przystanki"/>
+                <Label fx:id="stopListLabel" text="Przystanki"/>
+
                 <ListView fx:id="stopList"/>
+                <ListView fx:id="favoritesList" visible="false" managed="false"/>
+
                 <Button fx:id="addToFavoritesButton" text="❤️ Dodaj do ulubionych"/>
+                <Button fx:id="removeFromFavoritesButton" text="🗑️ Usuń z ulubionych" visible="false" managed="false"/>
+
+                <Button fx:id="showFavoritesButton" text="Pokaż ulubione"/>
                 <Button fx:id="getLinesButton" text="Pobierz Linie"/>
             </VBox>
+
 
             <VBox spacing="5">
                 <padding>
@@ -68,13 +63,13 @@
     </center>
 
     <right>
-        <SplitPane>
-            <!-- LEWA POŁOWA: Twoje ListView i przyciski -->
-            <VBox spacing="5">
-                <!-- pola: searchField, stopList, favoritesList, itd. -->
-            </VBox>
-            <!-- PRAWA POŁOWA: WebView z mapą -->
-            <WebView fx:id="mapView" prefWidth="500" prefHeight="600"/>
-        </SplitPane>
+        <VBox spacing="5" prefWidth="500">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <Label text="Mapa przystanku"/>
+            <WebView fx:id="mapView" prefWidth="460" VBox.vgrow="ALWAYS"/>
+        </VBox>
     </right>
+
 </BorderPane>

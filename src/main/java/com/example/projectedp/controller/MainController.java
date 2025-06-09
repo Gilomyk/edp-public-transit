@@ -26,25 +26,30 @@ public class MainController {
     @FXML private TextField searchField;
     @FXML private Button searchButton;
     @FXML private ListView<Stop> stopList;
+    @FXML private ListView<Stop> favoritesList;
     @FXML private ListView<Departure> departureList;
     @FXML private ListView<Line> lineList;
     @FXML private Button addToFavoritesButton;
     @FXML private Button removeFromFavoritesButton;
     @FXML private Button getLinesButton;
+    @FXML private Button showFavoritesButton;
     @FXML private Button getDeparturesButton;
     @FXML private Button notifyButton;
-    @FXML private ListView<Stop> favoritesList;
     @FXML private ListView<RecentSearch> recentSearchesList;
     @FXML private WebView mapView;
+    @FXML private Label stopListLabel;
 
     // --- Pola pomocnicze ---
     private final List<Stop> allStops = new ArrayList<>();
+    private List<Departure> allDepartures = new ArrayList<>();
+
     private final LinkedList<RecentSearch> recentSearches = new LinkedList<>();
     private JSObject jsBridge;
     private boolean mapInitialized = false;
     private EventBus eventBus;
     private DatabaseService databaseService;
     private ApiService apiService;
+    private Boolean showFavorites = false;
 
     // --- Wstrzykiwanie zależności ---
     public void setEventBus(EventBus eventBus) {
@@ -66,6 +71,7 @@ public class MainController {
         initListSelectionHandlers();
         initSearchHandling();
         initDepartureListView();
+        initLineListView();
 
         Platform.runLater(() -> eventBus.post(new AppInitializedEvent()));
     }
@@ -102,6 +108,7 @@ public class MainController {
 
         getLinesButton.setOnAction(event -> {
             Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
+            Stop selectedFavouriteStop = favoritesList.getSelectionModel().getSelectedItem();
             if (selectedStop != null) {
                 apiService.fetchLinesAsync(selectedStop.getId(), selectedStop.getStopNumber());
             } else {
@@ -109,19 +116,7 @@ public class MainController {
             }
         });
 
-//        getDeparturesButton.setOnAction(event -> {
-//            Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
-//            Line selectedLine = lineList.getSelectionModel().getSelectedItem();
-//            if (selectedStop != null && selectedLine != null) {
-//                apiService.fetchDeparturesAsync(
-//                        selectedStop.getId(),
-//                        selectedStop.getStopNumber(),
-//                        selectedLine.getLineNumber()
-//                );
-//            } else {
-//                System.out.println("⚠️ Wybierz przystanek i linię, aby pobrać odjazdy.");
-//            }
-//        });
+        getDeparturesButton.setOnAction(e -> updateDepartureList(allDepartures));
 
         addToFavoritesButton.setOnAction(event -> {
             Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
@@ -146,6 +141,8 @@ public class MainController {
                 }
             }
         });
+
+        showFavoritesButton.setOnAction(event -> toggleStopList());
 
         notifyButton.setOnAction(event -> {
             Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
@@ -180,6 +177,22 @@ public class MainController {
                 eventBus.post(new StopSearchRequestedEvent(newVal.getQuery()));
             }
         });
+
+        lineList.setOnMouseClicked(event -> {
+            Line selectedLine = lineList.getSelectionModel().getSelectedItem();
+            if (selectedLine != null) {
+                List<Departure> filtered = allDepartures.stream()
+                        .filter(d ->
+                                d.getLine().equals(selectedLine.getLineNumber()) &&
+                                        d.getDestination().equals(selectedLine.getDirection()))
+                        .sorted(Comparator.comparing(Departure::getTime))
+                        .toList();
+
+                departureList.getItems().setAll(filtered);
+            }
+        });
+
+
     }
 
     // --- Obsługa wyszukiwania i historii ---
@@ -220,6 +233,32 @@ public class MainController {
         });
     }
 
+    private void initLineListView() {
+        lineList.setCellFactory(listView -> new ListCell<>() {
+            @Override
+            protected void updateItem(Line line, boolean empty) {
+                super.updateItem(line, empty);
+                if (empty || line == null) {
+                    setGraphic(null);
+                } else {
+                    try {
+                        FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("component/LineCard.fxml"));
+                        HBox card = loader.load();
+
+                        LineCardController controller = loader.getController();
+                        controller.setData(line);
+
+                        setGraphic(card);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        setGraphic(new Label("Błąd ładowania widoku"));
+                    }
+                }
+            }
+        });
+    }
+
+
     public ListView<Departure> getDepartureList() {
         return departureList;
     }
@@ -251,12 +290,34 @@ public class MainController {
     }
 
     public void updateDepartureList(List<Departure> departures) {
+        this.allDepartures = new ArrayList<>(departures); // zachowujemy oryginał
         departureList.getItems().setAll(departures);
     }
+
 
     public void updateLineList(List<Line> lines) {
         lineList.getItems().setAll(lines);
     }
+
+    private void toggleStopList() {
+        showFavorites = !showFavorites;
+
+        stopList.setVisible(!showFavorites);
+        stopList.setManaged(!showFavorites);
+
+        favoritesList.setVisible(showFavorites);
+        favoritesList.setManaged(showFavorites);
+
+        addToFavoritesButton.setVisible(!showFavorites);
+        addToFavoritesButton.setManaged(!showFavorites);
+
+        removeFromFavoritesButton.setVisible(showFavorites);
+        removeFromFavoritesButton.setManaged(showFavorites);
+
+        stopListLabel.setText(showFavorites ? "Ulubione przystanki" : "Przystanki");
+        showFavoritesButton.setText(showFavorites ? "Pokaż wszystkie" : "Pokaż ulubione");
+    }
+
 
     public void addRecentSearch(String query) {
         recentSearches.removeIf(s -> s.getQuery().equalsIgnoreCase(query));
@@ -318,6 +379,8 @@ public class MainController {
             }
         });
     }
+
+
 
 
     // --- Pomocnicze ---

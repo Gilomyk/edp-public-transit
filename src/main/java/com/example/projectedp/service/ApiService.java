@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 public class ApiService {
@@ -23,6 +24,8 @@ public class ApiService {
     private final String resourceLines;
     private final String resourceDepartures;
     private final String apiKey;
+
+    private record ParsedDeparture(Departure departure, String lineNumber, String direction) {}
 
     public ApiService(EventBus eventBus) {
         this.eventBus = eventBus;
@@ -119,7 +122,7 @@ public class ApiService {
                             .GET()
                             .build();
 
-//                    System.out.println("Request: " + request);
+                    System.out.println("Request: " + request);
 
                     HttpClient client = HttpClient.newBuilder()
                             .followRedirects(HttpClient.Redirect.NORMAL)
@@ -191,16 +194,20 @@ public class ApiService {
                     JsonObject obj = el.getAsJsonObject();
                     JsonArray values = obj.getAsJsonArray("values");
 
-                    // Szukamy w values pary, gdzie key == "linia"
                     return values.asList().stream()
                             .map(JsonElement::getAsJsonObject)
                             .filter(valueObj -> "linia".equals(valueObj.get("key").getAsString()))
                             .findFirst()
-                            .map(valueObj -> new Line(valueObj.get("value").getAsString()))
-                            .orElse(null); // albo możesz użyć Optional::orElseThrow jeśli ma być obowiązkowe
+                            .map(valueObj -> {
+                                String lineNumber = valueObj.get("value").getAsString();
+                                return new Line(lineNumber, Collections.emptySet().toString()); // brak kierunków na tym etapie
+                            })
+                            .orElse(null); // lub orElseThrow
                 })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
+
 
 
 

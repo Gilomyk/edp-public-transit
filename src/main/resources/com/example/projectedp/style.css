@@ -1,0 +1,63 @@
+/* Ustawienia ogólne okna i kontenerów */
+.root {
+    -fx-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: #f5f7fa;
+}
+
+/* Przyciski */
+.button {
+    -fx-background-color: #2c7be5;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #1a5ecc;
+}
+
+/* ListView */
+.list-view {
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-radius: 5;
+    -fx-padding: 5;
+}
+
+/* Etykiety (Label) */
+.label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+/* TextField */
+.text-field {
+    -fx-border-color: #d1d5db;
+    -fx-border-radius: 5;
+    -fx-padding: 5 10 5 10;
+}
+
+/* Po najechaniu na TextField */
+.text-field:focused {
+    -fx-border-color: #2c7be5;
+    -fx-background-color: #eef4fb;
+}
+
+#departureList {
+    -fx-min-width: 200px;
+}
+
+#lineList {
+    -fx-min-width: 40px;
+}
+
+#favoritesList, #stopList {
+    -fx-min-width: 150px;
+}
+
+#mapView {
+    -fx-min-width: 600px;
+}
+

@@ -4,12 +4,12 @@ import com.example.projectedp.event.EventHandler;
 import com.example.projectedp.event.DeparturesLoadedEvent;
 import com.example.projectedp.model.Departure;
 import com.example.projectedp.controller.MainController;
+import com.example.projectedp.model.Line;
 import javafx.application.Platform;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Handler reagujący na zdarzenie pobrania listy odjazdów.
@@ -46,8 +46,25 @@ public class DeparturesLoadedHandler implements EventHandler<DeparturesLoadedEve
             return;
         }
 
-        // Jeśli są odjazdy — aktualizuj normalnie
-        Platform.runLater(() -> controller.updateDepartureList(upcoming));
+        // Budowanie mapy: linia → zbiór kierunków
+        Map<String, Set<String>> lineToDirections = new TreeMap<>();
+        for (Departure d : departures) {
+            lineToDirections
+                    .computeIfAbsent(d.getLine(), k -> new TreeSet<>())
+                    .add(d.getDestination());
+        }
+
+        // Tworzenie listy Line
+        List<Line> enrichedLines = departures.stream()
+                .map(d -> new Line(d.getLine(), d.getDestination()))
+                .distinct() // usuwa duplikaty bazując na equals()
+                .toList();
+
+
+        Platform.runLater(() -> {
+            controller.updateDepartureList(upcoming);
+            controller.updateLineList(new ArrayList<>(enrichedLines));
+        });
     }
 
 }

@@ -65,7 +65,11 @@ public class MainApp extends Application {
                 new LinesLoadedHandler(apiService, controller));
 
         stage.setTitle("Rozkład jazdy 3000");
-        stage.setScene(new Scene(root, 1000, 600));
+        Scene scene = new Scene(root, 1600, 800);
+
+        scene.getStylesheets().add(getClass().getResource("/com/example/projectedp/style.css").toExternalForm());
+
+        stage.setScene(scene);
         stage.show();
     }
 
