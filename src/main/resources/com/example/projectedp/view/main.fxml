@@ -58,6 +58,7 @@
                 <Label text="Najbliższe odjazdy"/>
                 <ListView fx:id="departureList"/>
                 <Button fx:id="notifyButton" text="🔔 Powiadom o kursie"/>
+                <Pane fx:id="timelineContainer" prefHeight="120" />
             </VBox>
         </SplitPane>
     </center>

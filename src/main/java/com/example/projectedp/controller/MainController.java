@@ -9,6 +9,7 @@ import com.example.projectedp.event.*;
 import com.example.projectedp.model.*;
 import com.example.projectedp.service.*;
 
+import com.example.projectedp.ui.DepartureTimelineView;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Worker;
@@ -16,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
@@ -44,11 +46,11 @@ public class MainController {
     @FXML private ListView<RecentSearch> recentSearchesList;
     @FXML private WebView mapView;
     @FXML private Label stopListLabel;
+    @FXML private Pane timelineContainer;
 
     // --- Pola pomocnicze ---
     private final List<Stop> allStops = new ArrayList<>();
     private List<Departure> allDepartures = new ArrayList<>();
-
     private final LinkedList<RecentSearch> recentSearches = new LinkedList<>();
     private JSObject jsBridge;
     private boolean mapInitialized = false;
@@ -56,6 +58,7 @@ public class MainController {
     private FavoriteStopDao favoriteStopDao = FavoriteStopDaoImpl.getInstance();;
     private ApiService apiService;
     private Boolean showFavorites = false;
+    private DepartureTimelineView timelineView;
 
     // --- Wstrzykiwanie zależności ---
     public void setEventBus(EventBus eventBus) {
@@ -79,6 +82,10 @@ public class MainController {
         initSearchHandling();
         initDepartureListView();
         initLineListView();
+
+        timelineView = new DepartureTimelineView();
+        timelineView.setPrefSize(timelineContainer.getPrefWidth(), timelineContainer.getPrefHeight());
+        timelineContainer.getChildren().add(timelineView);
 
         Platform.runLater(() -> eventBus.post(new AppInitializedEvent()));
     }
@@ -305,6 +312,7 @@ public class MainController {
         this.allDepartures = new ArrayList<>(departures); // zachowujemy oryginał
         Platform.runLater(() -> {
             departureList.setItems(FXCollections.observableArrayList(departures));
+            timelineView.setDepartures(departures);
         });
     }
 
