@@ -15,6 +15,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
+
 public class ApiService {
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final EventBus eventBus;
@@ -168,17 +172,18 @@ public class ApiService {
                     // "values" to tablica par { key:"...", value:"..." }
                     JsonArray vals = obj.getAsJsonArray("values");
 
-                    // Wyciągamy z niej odpowiednie pola:
-                    String zespol   = vals.get(0).getAsJsonObject().get("value").getAsString();   // np. "1001"
-                    String nazwa    = vals.get(2).getAsJsonObject().get("value").getAsString();   // np. "Kijowska"
-                    String szerGeo  = vals.get(4).getAsJsonObject().get("value").getAsString();   // np. "52.248455"
-                    String dlugGeo  = vals.get(5).getAsJsonObject().get("value").getAsString();   // np. "21.044827"
-                    String slupek   = vals.get(1).getAsJsonObject().get("value").getAsString();   // np. "01"
+                    // Bezpieczne odczyty z domyślną wartością lub pustym stringiem
+                    String zespol  = getValue(vals, 0);
+                    String slupek  = getValue(vals, 1);
+                    String nazwa   = getValue(vals, 2);
+                    String szerGeo = getValue(vals, 4);
+                    String dlugGeo = getValue(vals, 5);
 
-                    double lat = Double.parseDouble(szerGeo);
-                    double lon = Double.parseDouble(dlugGeo);
+                    // Parsowanie współrzędnych z bezpiecznym fallbackiem
+                    double lat = parseOrDefault(szerGeo, 0.0);
+                    double lon = parseOrDefault(dlugGeo, 0.0);
 
-                    return new Stop(zespol, nazwa, lat, lon, slupek);
+                    return new Stop(zespol, StringUtils.defaultIfBlank(nazwa, "Nieznana nazwa"), lat, lon, slupek);
                 })
                 .collect(Collectors.toList());
     }
@@ -243,6 +248,27 @@ public class ApiService {
                     return new Departure(id, line, kierunek, time);
                 })
                 .collect(Collectors.toList());
+    }
+
+    private String getValue(JsonArray vals, int index) {
+        try {
+            return StringUtils.trimToEmpty(
+                    vals.get(index)
+                            .getAsJsonObject()
+                            .get("value")
+                            .getAsString()
+            );
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private double parseOrDefault(String str, double fallback) {
+        try {
+            return Double.parseDouble(str);
+        } catch (NumberFormatException e) {
+            return fallback;
+        }
     }
 
 }

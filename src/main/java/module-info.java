@@ -11,6 +11,7 @@ module com.example.projectedp {
     requires jdk.jsobject;
     requires org.reflections;
     requires org.slf4j;
+    requires org.apache.commons.lang3;
 
     opens com.example.projectedp to javafx.fxml;
     opens com.example.projectedp.controller to javafx.fxml;

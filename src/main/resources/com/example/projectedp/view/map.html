@@ -32,12 +32,11 @@
 
         var markers = {};
 
-        function addMarker(lat, lon, stopId, stopName) {
+        function addMarker(lat, lon, stopId, stopName, stopNumber) {
             if (markers[stopId]) return;
 
             var marker = L.marker([lat, lon]).addTo(map);
 
-            // HTML przycisku wewnątrz popupu
             var popupContent = `
                 <div>
                     <strong>${stopName}</strong><br/>
@@ -51,11 +50,58 @@
             markers[stopId] = marker;
         }
 
+        function addSubMarker(lat, lon, stopId, stopName, stopNumber) {
+            var key = stopId + "_" + stopNumber;
+
+            var subIcon = L.icon({
+                iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png',
+                iconSize: [24, 24],
+                iconAnchor: [12, 24],
+                popupAnchor: [0, -24]
+            });
+
+            var marker = L.marker([lat, lon], { icon: subIcon, opacity: 0.85 }).addTo(map);
+
+            var popupContent = `
+                <div>
+                    <strong>${stopName} ${stopNumber}</strong><br/>
+                    <button onclick="onShowDeparturesClicked('${stopId}', '${stopNumber}', '${key}')">🚌 Pokaż odjazdy</button>
+                </div>
+            `;
+
+            marker.bindPopup(popupContent);
+            marker.stopId = stopId;
+            marker.isSubStop = true;
+
+            markers[key] = marker;
+        }
+
         function onShowGroupClicked(stopId) {
             if (window.app && typeof app.onStopGroupClicked === 'function') {
                 app.onStopGroupClicked(stopId);
             }
         }
+
+        function onShowDeparturesClicked(stopId, stopNumber, markerKey) {
+            // wywołanie Javy
+            if (window.app && typeof app.onSubStopClicked === 'function') {
+                app.onSubStopClicked(stopId, stopNumber);
+            }
+
+            // podświetlenie markera
+            var marker = markers[markerKey];
+            if (marker) {
+                marker.setOpacity(1.0);
+                map.setView(marker.getLatLng(), 15);
+                marker.openPopup();
+
+                // po 3 sekundy przywrócenie przezroczystości
+                setTimeout(() => {
+                    marker.setOpacity(0.85);
+                }, 3000);
+            }
+        }
+
 
         function clearMarkers() {
             for (var id in markers) {

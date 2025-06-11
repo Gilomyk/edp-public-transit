@@ -10,6 +10,7 @@ import com.example.projectedp.model.*;
 import com.example.projectedp.service.*;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MainController {
 
@@ -191,8 +193,8 @@ public class MainController {
             if (selectedLine != null) {
                 List<Departure> filtered = allDepartures.stream()
                         .filter(d ->
-                                d.getLine().equals(selectedLine.getLineNumber()) &&
-                                        d.getDestination().equals(selectedLine.getDirection()))
+                                d.getLine().trim().equalsIgnoreCase(selectedLine.getLineNumber().trim()) &&
+                                        d.getDestination().trim().equalsIgnoreCase(selectedLine.getDirection().trim()))
                         .sorted(Comparator.comparing(Departure::getTime))
                         .toList();
 
@@ -290,21 +292,27 @@ public class MainController {
             return stop;
         }).toList();
 
-        stopList.getItems().setAll(formatted);
+        Platform.runLater(() -> {
+            stopList.setItems(FXCollections.observableArrayList(formatted));
+        });
     }
 
     public void updateFavoritesList(List<Stop> favorites) {
-        Platform.runLater(() -> favoritesList.getItems().setAll(favorites));
+        Platform.runLater(() -> favoritesList.setItems(FXCollections.observableArrayList(favorites)));
     }
 
     public void updateDepartureList(List<Departure> departures) {
         this.allDepartures = new ArrayList<>(departures); // zachowujemy oryginał
-        departureList.getItems().setAll(departures);
+        Platform.runLater(() -> {
+            departureList.setItems(FXCollections.observableArrayList(departures));
+        });
     }
 
 
     public void updateLineList(List<Line> lines) {
-        lineList.getItems().setAll(lines);
+        Platform.runLater(() -> {
+            lineList.setItems(FXCollections.observableArrayList(lines));
+        });
     }
 
     private void toggleStopList() {
@@ -371,23 +379,54 @@ public class MainController {
             return;
         }
 
+        boolean isSubGroup = stops.stream()
+                .map(Stop::getId)
+                .distinct()
+                .count() == 1;
+
+        String jsFunction = isSubGroup ? "addSubMarker" : "addMarker";
+
         Platform.runLater(() -> {
             WebEngine webEngine = mapView.getEngine();
             webEngine.executeScript("clearMarkers();");
             for (Stop s : stops) {
                 String jsCode = String.format(Locale.US,
-                        "addMarker(%f, %f, '%s', '%s');",
+                        "%s(%f, %f, '%s', '%s', '%s');",
+                        jsFunction,
                         s.getLatitude(),
                         s.getLongitude(),
                         s.getId(),
-                        s.getName().replace("'", "\\'")
+                        s.getName().replace("'", "\\'"),
+                        s.getStopNumber()
                 );
-//                System.out.println(jsCode);
                 webEngine.executeScript(jsCode);
             }
         });
     }
 
+    public void onStopGroupClicked(String stopId) {
+        System.out.println("🟡 onStopGroupClicked: stopId = " + stopId);
+
+        List<Stop> allStops = getAllStops();
+        List<Stop> groupStops = allStops.stream()
+                .filter(stop -> stop.getId().equals(stopId))
+                .collect(Collectors.toList());
+
+        System.out.println("🔍 Znaleziono słupków: " + groupStops.size());
+        for (Stop stop : groupStops) {
+            System.out.println("➡️ " + stop.getName() + " [" + stop.getStopNumber() + "]");
+        }
+
+        if (!groupStops.isEmpty()) {
+            plotStopsOnMap(groupStops);
+            updateStopList(groupStops);
+        }
+    }
+
+    public void onSubStopClicked(String stopId, String stopNumber) {
+        Stop selectedStop = new Stop(stopId, "", 0.0, 0.0, stopNumber);
+        apiService.fetchLinesAsync(selectedStop.getId(), selectedStop.getStopNumber());
+    }
 
 
 
