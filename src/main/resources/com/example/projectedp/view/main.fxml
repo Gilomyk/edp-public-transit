@@ -34,8 +34,8 @@
                 <ListView fx:id="stopList"/>
                 <ListView fx:id="favoritesList" visible="false" managed="false"/>
 
-                <Button fx:id="addToFavoritesButton" text="❤️ Dodaj do ulubionych"/>
-                <Button fx:id="removeFromFavoritesButton" text="🗑️ Usuń z ulubionych" visible="false" managed="false"/>
+                <Button fx:id="addToFavoritesButton" text="❤ Dodaj do ulubionych"/>
+                <Button fx:id="removeFromFavoritesButton" text="🗑 Usuń z ulubionych" visible="false" managed="false"/>
 
                 <Button fx:id="showFavoritesButton" text="Pokaż ulubione"/>
                 <Button fx:id="getLinesButton" text="Pobierz Linie"/>
@@ -57,7 +57,6 @@
                 </padding>
                 <Label text="Najbliższe odjazdy"/>
                 <ListView fx:id="departureList"/>
-                <Button fx:id="notifyButton" text="🔔 Powiadom o kursie"/>
                 <Pane fx:id="timelineContainer" prefHeight="120" />
             </VBox>
         </SplitPane>

@@ -3,8 +3,6 @@ package com.example.projectedp.controller;
 import com.example.projectedp.MainApp;
 import com.example.projectedp.dao.FavoriteStopDao;
 import com.example.projectedp.dao.FavoriteStopDaoImpl;
-import com.example.projectedp.dao.SearchHistoryDao;
-import com.example.projectedp.dao.SearchHistoryDaoImpl;
 import com.example.projectedp.event.*;
 import com.example.projectedp.model.*;
 import com.example.projectedp.service.*;
@@ -42,7 +40,6 @@ public class MainController {
     @FXML private Button getLinesButton;
     @FXML private Button showFavoritesButton;
     @FXML private Button getDeparturesButton;
-    @FXML private Button notifyButton;
     @FXML private ListView<RecentSearch> recentSearchesList;
     @FXML private WebView mapView;
     @FXML private Label stopListLabel;
@@ -160,17 +157,6 @@ public class MainController {
         });
 
         showFavoritesButton.setOnAction(event -> toggleStopList());
-
-        notifyButton.setOnAction(event -> {
-            Stop selectedStop = stopList.getSelectionModel().getSelectedItem();
-            if (selectedStop != null) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Powiadomienie");
-                alert.setHeaderText(null);
-                alert.setContentText("Powiadomienie o przystanku: " + selectedStop.getName());
-                alert.showAndWait();
-            }
-        });
     }
 
     // --- Obsługa list wyboru ---

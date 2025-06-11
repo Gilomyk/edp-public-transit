@@ -8,7 +8,9 @@ import com.google.gson.*;
 import java.net.http.*;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -236,11 +238,20 @@ public class ApiService {
                     String kierunek = valueMap.getOrDefault("kierunek", "");
                     String czasStr = valueMap.getOrDefault("czas", "00:00:00");
 
+                    // Rozbijamy HH:mm:ss
+                    String[] parts = czasStr.split(":");
+                    int hh = Integer.parseInt(parts[0]);
+                    int mm = Integer.parseInt(parts[1]);
+                    int ss = Integer.parseInt(parts[2]);
+
+                    LocalDate today = LocalDate.now();
+
+                    // Jeśli godzina >=24, to dzień+1 i hh-24
                     LocalDateTime time;
-                    try {
-                        time = LocalDateTime.parse(LocalDateTime.now().toLocalDate() + "T" + czasStr);
-                    } catch (Exception e) {
-                        time = LocalDateTime.now(); // fallback w razie błędu parsowania
+                    if (hh >= 24) {
+                        time = LocalDateTime.of(today.plusDays(1), LocalTime.of(hh - 24, mm, ss));
+                    } else {
+                        time = LocalDateTime.of(today, LocalTime.of(hh, mm, ss));
                     }
 
                     String id = line + "_" + czasStr.replace(":", "");

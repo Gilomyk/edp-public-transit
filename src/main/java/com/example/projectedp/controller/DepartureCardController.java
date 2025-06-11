@@ -17,11 +17,19 @@ public class DepartureCardController {
         lineText.setText("Linia " + line);
         destinationText.setText(destination);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        departureTimeText.setText("Odjazd: " + departureTime.format(formatter));
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm");
+        String timeStr = departureTime.format(fmt);
 
-        long minutes = Duration.between(LocalDateTime.now(), departureTime).toMinutes();
-        String countdown = minutes >= 0 ? minutes + " min" : "Odjechał";
-        countdownText.setText(countdown);
+        // Dodajemy „jutro”, jeśli godzina dnia następnego
+        String label = "Odjazd: " + timeStr;
+        if (departureTime.toLocalDate().isAfter(now.toLocalDate())) {
+            label += " (jutro)";
+        }
+        departureTimeText.setText(label);
+
+        long minutes = Duration.between(now, departureTime).toMinutes();
+        countdownText.setText(minutes >= 0 ? minutes + " min" : "Odjechał");
     }
+
 }
