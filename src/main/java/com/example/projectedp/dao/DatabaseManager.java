@@ -23,12 +23,12 @@ public class DatabaseManager {
         try (Statement stmt = conn.createStatement()) {
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS favorites (
-                    stop_id     TEXT PRIMARY KEY,
-                    name        TEXT NOT NULL,
+                    stop_id TEXT NOT NULL,
+                    name TEXT,
                     stop_number TEXT NOT NULL,
-                    latitude    REAL,
-                    longitude   REAL,
-                    added_at    DATETIME DEFAULT CURRENT_TIMESTAMP
+                    latitude REAL,
+                    longitude REAL,
+                    PRIMARY KEY (stop_id, stop_number)
                 );
             """);
             stmt.execute("""
