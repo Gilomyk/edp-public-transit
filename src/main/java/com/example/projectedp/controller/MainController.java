@@ -5,7 +5,7 @@ import com.example.projectedp.dao.FavoriteStopDao;
 import com.example.projectedp.dao.FavoriteStopDaoImpl;
 import com.example.projectedp.event.*;
 import com.example.projectedp.model.*;
-import com.example.projectedp.service.*;
+import com.example.projectedp.service.ApiService;
 
 import com.example.projectedp.ui.DepartureTimelineView;
 import javafx.application.Platform;
@@ -52,7 +52,7 @@ public class MainController {
     private JSObject jsBridge;
     private boolean mapInitialized = false;
     private EventBus eventBus;
-    private FavoriteStopDao favoriteStopDao = FavoriteStopDaoImpl.getInstance();;
+    private final FavoriteStopDao favoriteStopDao = FavoriteStopDaoImpl.getInstance();
     private ApiService apiService;
     private Boolean showFavorites = false;
     private DepartureTimelineView timelineView;
@@ -61,10 +61,6 @@ public class MainController {
     public void setEventBus(EventBus eventBus) {
         this.eventBus = eventBus;
     }
-
-//    public void setDatabaseService(DatabaseService databaseService) {
-//        this.databaseService = databaseService;
-//    }
 
 
     public void setApiService(ApiService apiService) {
@@ -90,7 +86,7 @@ public class MainController {
     // --- Inicjalizacja mapy ---
     private void initMap() {
         WebEngine webEngine = mapView.getEngine();
-        webEngine.load(MainApp.class.getResource("view/map.html").toExternalForm());
+        webEngine.load(Objects.requireNonNull(MainApp.class.getResource("view/map.html")).toExternalForm());
 
         webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
@@ -108,12 +104,8 @@ public class MainController {
 
     // --- Obsługa przycisków ---
     private void initButtonHandlers() {
-        searchButton.setOnAction(event -> {
-            String query = searchField.getText();
-            if (query != null && !query.isBlank()) {
-                eventBus.post(new StopSearchRequestedEvent(query));
-            }
-        });
+        searchButton.setOnAction(e -> performSearch());
+        searchField.setOnAction(e -> performSearch());
 
         getLinesButton.setOnAction(event -> {
             Stop selectedStop;
@@ -121,7 +113,6 @@ public class MainController {
                 selectedStop = stopList.getSelectionModel().getSelectedItem();
             } else {
                 selectedStop = favoritesList.getSelectionModel().getSelectedItem();
-                System.out.println("tutaj");
             }
             if (selectedStop != null) {
                 apiService.fetchLinesAsync(selectedStop.getId(), selectedStop.getStopNumber());
@@ -261,6 +252,10 @@ public class MainController {
         });
     }
 
+    private void performSearch() {
+        String query = searchField.getText();
+        eventBus.post(new StopSearchRequestedEvent(query));
+    }
 
     public ListView<Departure> getDepartureList() {
         return departureList;
@@ -285,9 +280,7 @@ public class MainController {
             return stop;
         }).toList();
 
-        Platform.runLater(() -> {
-            stopList.setItems(FXCollections.observableArrayList(formatted));
-        });
+        Platform.runLater(() -> stopList.setItems(FXCollections.observableArrayList(formatted)));
     }
 
     public void updateFavoritesList(List<Stop> favorites) {
@@ -304,9 +297,7 @@ public class MainController {
 
 
     public void updateLineList(List<Line> lines) {
-        Platform.runLater(() -> {
-            lineList.setItems(FXCollections.observableArrayList(lines));
-        });
+        Platform.runLater(() -> lineList.setItems(FXCollections.observableArrayList(lines)));
     }
 
     private void toggleStopList() {
@@ -359,14 +350,6 @@ public class MainController {
         System.out.println("Mapa została zainicjalizowana");
     }
 
-    public boolean isMapInitialized() {
-        return mapInitialized;
-    }
-
-    public void setMapInitialized(boolean value) {
-        this.mapInitialized = value;
-    }
-
     public void plotStopsOnMap(List<Stop> stops) {
         if (!mapInitialized) {
             System.out.println("Mapa jeszcze nie zainicjalizowana, pomijam plotStopsOnMap");
@@ -398,6 +381,21 @@ public class MainController {
         });
     }
 
+    public void highlightStopOnMap(Stop stop) {
+        if (!mapInitialized) return;
+
+        Platform.runLater(() -> {
+            WebEngine webEngine = mapView.getEngine();
+            String jsCode = String.format(Locale.US,
+                    "highlightMarker('%s', '%s');",
+                    stop.getId(),
+                    stop.getStopNumber()
+            );
+            webEngine.executeScript(jsCode);
+        });
+    }
+
+
     public void onStopGroupClicked(String stopId) {
         System.out.println("🟡 onStopGroupClicked: stopId = " + stopId);
 
@@ -422,18 +420,6 @@ public class MainController {
         apiService.fetchLinesAsync(selectedStop.getId(), selectedStop.getStopNumber());
     }
 
-
-
-    // --- Pomocnicze ---
-    private void showError(String message) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Błąd");
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
-        });
-    }
 
     public List<Stop> getAllStops() {
         return allStops;
