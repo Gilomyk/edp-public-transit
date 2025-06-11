@@ -1,14 +1,13 @@
 package com.example.projectedp;
 
 import com.example.projectedp.controller.MainController;
+import com.example.projectedp.dao.DatabaseManager;
 import com.example.projectedp.dao.FavoriteStopDao;
 import com.example.projectedp.dao.FavoriteStopDaoImpl;
 import com.example.projectedp.dao.SearchHistoryDaoImpl;
-import com.example.projectedp.dao.DatabaseManager;
-import com.example.projectedp.event.*;
-import com.example.projectedp.event.handler.*;
-import com.example.projectedp.service.*;
-import com.example.projectedp.model.*;
+import com.example.projectedp.event.EventBus;
+import com.example.projectedp.model.Stop;
+import com.example.projectedp.service.ApiService;
 import com.example.projectedp.util.EventHandlerLoader;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -16,9 +15,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import java.sql.*;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 

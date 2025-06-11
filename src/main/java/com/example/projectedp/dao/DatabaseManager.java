@@ -40,9 +40,4 @@ public class DatabaseManager {
             """);
         }
     }
-
-    public static void close() throws SQLException {
-        if (conn != null) conn.close();
-    }
-
 }

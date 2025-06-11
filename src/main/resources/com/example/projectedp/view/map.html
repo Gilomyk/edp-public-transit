@@ -30,6 +30,20 @@
             attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
         }).addTo(map);
 
+        const redIcon = L.icon({
+            iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png',
+            iconSize: [24, 24],
+            iconAnchor: [12, 24],
+            popupAnchor: [0, -24]
+        });
+
+        const defaultIcon = L.icon({
+            iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png',
+            iconSize: [24, 24],
+            iconAnchor: [12, 24],
+            popupAnchor: [0, -24]
+        });
+
         var markers = {};
 
         function addMarker(lat, lon, stopId, stopName, stopNumber) {
@@ -102,6 +116,23 @@
             }
         }
 
+        let highlightedMarker = null;
+
+        function highlightMarker(id, stopNumber) {
+            // Resetuj poprzedni zaznaczony marker
+            if (highlightedMarker) {
+                highlightedMarker.setIcon(defaultIcon);
+            }
+
+            const key = id + "_" + stopNumber;
+            const marker = markers[key]; // musisz mieć mapę ID -> marker
+
+            if (marker) {
+                marker.setIcon(redIcon); // redIcon to np. Leaflet icon z czerwonym znacznikiem
+                highlightedMarker = marker;
+                marker.openPopup(); // opcjonalnie
+            }
+        }
 
         function clearMarkers() {
             for (var id in markers) {

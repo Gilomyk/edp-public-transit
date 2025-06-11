@@ -22,10 +22,10 @@ public class StopSelectedHandler implements EventHandler<StopSelectedEvent> {
     public void handle(StopSelectedEvent event) {
         Stop selected = event.getSelectedStop();
 
-        // 1) Zaznacz w GUI wybrany przystanek (highlight w stopList, jeżeli chcesz)
-//        controller.highlightStopInList(selected);
+        // 1) Zaznacz w GUI wybrany przystanek
+        controller.highlightStopOnMap(selected);
 
         // 2) Pobierz odjazdy z API asynchronicznie
-//        apiService.fetchDeparturesAsync(selected.getId());
+        apiService.fetchLinesAsync(selected.getId(), selected.getStopNumber());
     }
 }

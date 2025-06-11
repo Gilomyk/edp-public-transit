@@ -1,7 +1,5 @@
 package com.example.projectedp.model;
 
-import java.util.Set;
-
 public class Line {
     private final String lineNumber;
     private final String direction; // pojedynczy kierunek, nie zbiór

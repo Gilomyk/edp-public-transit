@@ -34,11 +34,10 @@
                 <ListView fx:id="stopList"/>
                 <ListView fx:id="favoritesList" visible="false" managed="false"/>
 
+                <Button fx:id="getLinesButton" text="Pobierz Linie"/>
                 <Button fx:id="addToFavoritesButton" text="❤ Dodaj do ulubionych"/>
                 <Button fx:id="removeFromFavoritesButton" text="🗑 Usuń z ulubionych" visible="false" managed="false"/>
-
                 <Button fx:id="showFavoritesButton" text="Pokaż ulubione"/>
-                <Button fx:id="getLinesButton" text="Pobierz Linie"/>
             </VBox>
 
 

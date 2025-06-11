@@ -1,13 +1,16 @@
 package com.example.projectedp.service;
 
 import com.example.projectedp.event.*;
-import com.example.projectedp.model.*;
-
-
+import com.example.projectedp.model.Departure;
+import com.example.projectedp.model.Line;
+import com.example.projectedp.model.Stop;
 import com.google.gson.*;
-import java.net.http.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -17,9 +20,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.ObjectUtils;
 
 public class ApiService {
     private final HttpClient httpClient = HttpClient.newHttpClient();

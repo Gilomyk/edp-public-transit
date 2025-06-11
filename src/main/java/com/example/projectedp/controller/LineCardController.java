@@ -11,10 +11,7 @@ public class LineCardController {
     @FXML
     private Label directionLabel;
 
-    private Line line;
-
     public void setData(Line line) {
-        this.line = line;
         lineNumberLabel.setText(line.getLineNumber());
 
         // Jeśli lista kierunków jest pusta, nie pokazujemy nic
@@ -25,7 +22,4 @@ public class LineCardController {
         }
     }
 
-    public Line getLine() {
-        return line;
-    }
 }

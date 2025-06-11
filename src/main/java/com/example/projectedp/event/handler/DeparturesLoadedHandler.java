@@ -1,17 +1,16 @@
 package com.example.projectedp.event.handler;
 
-import com.example.projectedp.event.EventHandler;
+import com.example.projectedp.controller.MainController;
 import com.example.projectedp.event.DeparturesLoadedEvent;
+import com.example.projectedp.event.EventHandler;
 import com.example.projectedp.event.Handles;
 import com.example.projectedp.model.Departure;
-import com.example.projectedp.controller.MainController;
 import com.example.projectedp.model.Line;
 import javafx.application.Platform;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Handler reagujący na zdarzenie pobrania listy odjazdów.

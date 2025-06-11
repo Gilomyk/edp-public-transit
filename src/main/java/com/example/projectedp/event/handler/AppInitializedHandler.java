@@ -3,14 +3,11 @@ package com.example.projectedp.event.handler;
 import com.example.projectedp.controller.MainController;
 import com.example.projectedp.dao.FavoriteStopDao;
 import com.example.projectedp.dao.FavoriteStopDaoImpl;
-import com.example.projectedp.dao.SearchHistoryDao;
-import com.example.projectedp.dao.SearchHistoryDaoImpl;
 import com.example.projectedp.event.AppInitializedEvent;
 import com.example.projectedp.event.EventHandler;
 import com.example.projectedp.event.Handles;
 import com.example.projectedp.model.Stop;
 import com.example.projectedp.service.ApiService;
-import com.example.projectedp.service.DatabaseService;
 import javafx.application.Platform;
 
 import java.sql.SQLException;

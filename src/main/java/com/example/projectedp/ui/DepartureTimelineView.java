@@ -1,8 +1,6 @@
 package com.example.projectedp.ui;
 
 import com.example.projectedp.model.Departure;
-import javafx.beans.binding.Bindings;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
@@ -27,7 +25,7 @@ public class DepartureTimelineView extends Region {
     private static final int MAX_DEPARTURES = 10;
     private static final int MAX_MINUTES = 60;   // maksymalny zakres czasu na osi w minutach
 
-    private Pane content;
+    private final Pane content;
 
     private List<Departure> departures;
     private LocalDateTime now;
@@ -87,9 +85,6 @@ public class DepartureTimelineView extends Region {
         if (departures == null || departures.isEmpty()) {
             return;
         }
-
-        boolean shiftUp = true;
-        boolean shiftDown = true;
 
         Map<LocalDateTime, List<Departure>> grouped = departures.stream()
                 .collect(Collectors.groupingBy(d -> d.getTime().withSecond(0).withNano(0),
